@@ -25,6 +25,7 @@
   --color-blush: var(--blush);
   --color-nude: var(--nude);
   --color-cream: var(--cream);
+  --color-rating: var(--rating);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -69,6 +70,7 @@
 
 :root {
   --radius: 0.75rem;
+  --rating: oklch(0.7 0.15 80);
   --background: oklch(0.962 0.012 30);
   --cream: oklch(0.993 0.005 30);
   --blush: oklch(0.931 0.022 24.4);
@@ -107,6 +109,7 @@
 }
 
 .dark {
+  --rating: oklch(0.83 0.15 80);
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);

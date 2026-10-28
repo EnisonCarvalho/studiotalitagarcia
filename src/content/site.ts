@@ -23,6 +23,12 @@ import cilios from "@/assets/cilios.jpg.asset.json";
 import sobrancelhas from "@/assets/sobrancelhas.png.asset.json";
 import unhas from "@/assets/unhas.jpg.asset.json";
 import depilacao from "@/assets/depilacao.jpg.asset.json";
+import unhasAzul from "@/assets/unhas-azul.jpeg.asset.json";
+import unhasRosa from "@/assets/unhas-rosa.jpeg.asset.json";
+import ciliosFio from "@/assets/cilios-fio-a-fio.png.asset.json";
+import ciliosVolume from "@/assets/cilios-volumosos.png.asset.json";
+import sobrancelhasColagem from "@/assets/sobrancelhas-colagem.png.asset.json";
+import sobrancelhasTg from "@/assets/sobrancelhas-cilios-tg.png.asset.json";
 
 export const LOGO = logo.url;
 
@@ -57,11 +63,17 @@ export const services: {
 
 // Galeria: adicione fotos reais com sua categoria.
 export const gallery: (Photo & { category: Category; tall?: boolean })[] = [
-  { src: cilios.url, category: "Cílios", alt: "Resultado de cílios", label: "Cílios", tall: true },
-  { src: sobrancelhas.url, category: "Sobrancelhas", alt: "Resultado de sobrancelhas", label: "Sobrancelhas" },
-  { src: unhas.url, category: "Unhas", alt: "Resultado de unhas", label: "Unhas" },
-  { src: depilacao.url, category: "Depilação", alt: "Sessão de depilação com cera", label: "Depilação", tall: true },
+  { src: unhasAzul.url, category: "Unhas", alt: "Unhas azul-turquesa com detalhes brancos e dourados", label: "Unhas", tall: true },
+  { src: ciliosFio.url, category: "Cílios", alt: "Extensão de cílios com olhar marcante", label: "Cílios", tall: true },
+  { src: sobrancelhasColagem.url, category: "Sobrancelhas", alt: "Colagem de resultados de sobrancelhas e cílios", label: "Sobrancelhas" },
+  { src: unhasRosa.url, category: "Unhas", alt: "Unhas rosa natural com brilho delicado", label: "Unhas", tall: true },
+  { src: ciliosVolume.url, category: "Cílios", alt: "Resultado de cílios volumosos", label: "Cílios", tall: true },
+  { src: sobrancelhasTg.url, category: "Sobrancelhas", alt: "Três resultados de design de sobrancelhas e extensão de cílios", label: "Sobrancelhas", tall: true },
 ];
 
 // Depoimentos reais autorizados: { text, name, stars? }
-export const testimonials: { text: string; name: string; stars?: number }[] = [];
+export const testimonials: { text: string; name: string; stars?: number }[] = [
+  { name: "Suely", text: "Amei o atendimento e o resultado! Tudo feito com muito capricho. ❤️", stars: 5 },
+  { name: "Ana", text: "Atendimento maravilhoso, ambiente aconchegante e trabalho impecável! Super recomendo.", stars: 5 },
+  { name: "Isabella", text: "Adorei minha experiência! Fiz minhas unhas e ficaram lindas.", stars: 5 },
+];

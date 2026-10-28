@@ -1,0 +1,3 @@
+- [x] Substituir somente as fotos de Resultados reais pelas seis novas fotos enviadas.
+- [x] Incluir Suely, Ana e Isabella em depoimentos de cinco estrelas com abas automáticas.
+- [ ] Conferir fotos, filtros e rotação dos depoimentos no site.

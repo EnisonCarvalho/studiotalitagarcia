@@ -40,6 +40,10 @@ function Status() {
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
 
   const b = q.data;
+  const [autoTried, setAutoTried] = useState(false);
+  useEffect(() => {
+    if (b && b.status === "pending" && !b.pix_qr_code && !autoTried) { setAutoTried(true); retryPix(); }
+  }, [b, autoTried]);
   async function retryPix() {
     setRetrying(true); setPixErr(null);
     const r = await createPix({ data: { id } }).catch(() => ({ ok: false as const, error: "Falha de conexão. Tente novamente." }));

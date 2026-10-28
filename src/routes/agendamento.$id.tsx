@@ -3,9 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type ReactNode } from "react";
 import { CheckCircle2, Copy, CreditCard, Loader2, MessageCircle, XCircle } from "lucide-react";
-import { createCardCheckout, createPixPayment, getBookingStatus } from "@/lib/booking.functions";
+import { createCardPayment, createPixPayment, getBookingStatus, getPaymentConfig } from "@/lib/booking.functions";
 import { brl, fmtDateTime } from "@/lib/booking-rules";
 import { ADDRESS, LOGO, whatsappLink } from "@/content/site";
+import { CardPaymentBrick } from "@/components/card-payment-brick";
 
 export const Route = createFileRoute("/agendamento/$id")({
   head: () => ({

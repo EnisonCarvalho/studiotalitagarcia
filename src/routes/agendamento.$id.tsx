@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { CheckCircle2, Copy, Loader2, MessageCircle, XCircle } from "lucide-react";
 import { createPixPayment, getBookingStatus } from "@/lib/booking.functions";
 import { brl, fmtDateTime } from "@/lib/booking-rules";
@@ -47,7 +47,7 @@ function Status() {
     await q.refetch(); setRetrying(false);
   }
 
-  const shell = (children: React.ReactNode) => (
+  const shell = (children: ReactNode) => (
     <div className="min-h-screen px-5 py-10">
       <div className="mx-auto max-w-xl">
         <Link to="/" className="mb-8 flex justify-center"><img src={LOGO} alt="Studio Talita Garcia" className="h-20 w-20" /></Link>

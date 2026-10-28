@@ -10,11 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AgendarRouteImport } from './routes/agendar'
+import { Route as AgendamentoIdRouteImport } from './routes/agendamento.$id'
 import { Route as ApiPublicMercadopagoRouteImport } from './routes/api/public/mercadopago'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgendarRoute = AgendarRouteImport.update({
+  id: '/agendar',
+  path: '/agendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgendamentoIdRoute = AgendamentoIdRouteImport.update({
+  id: '/agendamento/$id',
+  path: '/agendamento/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicMercadopagoRoute = ApiPublicMercadopagoRouteImport.update({
@@ -25,27 +37,40 @@ const ApiPublicMercadopagoRoute = ApiPublicMercadopagoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/agendar': typeof AgendarRoute
+  '/agendamento/$id': typeof AgendamentoIdRoute
   '/api/public/mercadopago': typeof ApiPublicMercadopagoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/agendar': typeof AgendarRoute
+  '/agendamento/$id': typeof AgendamentoIdRoute
   '/api/public/mercadopago': typeof ApiPublicMercadopagoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/agendar': typeof AgendarRoute
+  '/agendamento/$id': typeof AgendamentoIdRoute
   '/api/public/mercadopago': typeof ApiPublicMercadopagoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/mercadopago'
+  fullPaths: '/' | '/agendar' | '/agendamento/$id' | '/api/public/mercadopago'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/mercadopago'
-  id: '__root__' | '/' | '/api/public/mercadopago'
+  to: '/' | '/agendar' | '/agendamento/$id' | '/api/public/mercadopago'
+  id:
+    | '__root__'
+    | '/'
+    | '/agendar'
+    | '/agendamento/$id'
+    | '/api/public/mercadopago'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AgendarRoute: typeof AgendarRoute
+  AgendamentoIdRoute: typeof AgendamentoIdRoute
   ApiPublicMercadopagoRoute: typeof ApiPublicMercadopagoRoute
 }
 
@@ -56,6 +81,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agendar': {
+      id: '/agendar'
+      path: '/agendar'
+      fullPath: '/agendar'
+      preLoaderRoute: typeof AgendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agendamento/$id': {
+      id: '/agendamento/$id'
+      path: '/agendamento/$id'
+      fullPath: '/agendamento/$id'
+      preLoaderRoute: typeof AgendamentoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/mercadopago': {
@@ -70,6 +109,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AgendarRoute: AgendarRoute,
+  AgendamentoIdRoute: AgendamentoIdRoute,
   ApiPublicMercadopagoRoute: ApiPublicMercadopagoRoute,
 }
 export const routeTree = rootRouteImport

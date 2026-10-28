@@ -40,7 +40,7 @@ export const createPixPayment = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => idSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { mpCreatePix, mpToken } = await import("@/lib/mercadopago.server");
+    const { mpCreatePix, mpToken, payerEmail } = await import("@/lib/mercadopago.server");
     if (!mpToken()) return { ok: false as const, error: "O pagamento online ainda não foi ativado pelo studio. Fale conosco pelo WhatsApp." };
     const { data: b } = await supabaseAdmin.from("bookings").select("*").eq("id", data.id).single();
     if (!b) return { ok: false as const, error: "Reserva não encontrada." };
@@ -50,7 +50,7 @@ export const createPixPayment = createServerFn({ method: "POST" })
     try {
       const origin = new URL(getRequest().url).origin;
       const p = await mpCreatePix({
-        bookingId: b.id, amountCents: b.deposit_cents, email: b.customer_email, name: b.customer_name,
+        bookingId: b.id, amountCents: b.deposit_cents, email: payerEmail(b.customer_email, b.id), name: b.customer_name,
         description: `Sinal - ${b.service_name} - Studio Talita Garcia`, expiresAt: new Date(b.hold_expires_at),
         notificationUrl: `${origin}/api/public/mercadopago`,
       });
@@ -63,19 +63,44 @@ export const createPixPayment = createServerFn({ method: "POST" })
     }
   });
 
-/** Status público da reserva. Se houver pagamento pendente, consulta o Mercado Pago (fonte da verdade). */
+/** Gera o link de pagamento com cartão de crédito (Checkout Mercado Pago). */
+export const createCardCheckout = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => idSchema.parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { mpCreateCardCheckout, mpToken, payerEmail } = await import("@/lib/mercadopago.server");
+    if (!mpToken()) return { ok: false as const, error: "O pagamento online ainda não foi ativado pelo studio. Fale conosco pelo WhatsApp." };
+    const { data: b } = await supabaseAdmin.from("bookings").select("*").eq("id", data.id).single();
+    if (!b) return { ok: false as const, error: "Reserva não encontrada." };
+    if (b.status !== "pending" || !b.hold_expires_at || new Date(b.hold_expires_at) <= new Date())
+      return { ok: false as const, error: "Essa reserva não está mais aguardando pagamento." };
+    if (b.mp_checkout_url) return { ok: true as const, url: b.mp_checkout_url };
+    try {
+      const url = await mpCreateCardCheckout({
+        bookingId: b.id, amountCents: b.deposit_cents, title: `Sinal - ${b.service_name}`, email: payerEmail(b.customer_email, b.id),
+        expiresAt: new Date(b.hold_expires_at), origin: new URL(getRequest().url).origin,
+      });
+      await supabaseAdmin.from("bookings").update({ mp_checkout_url: url }).eq("id", b.id);
+      await supabaseAdmin.from("booking_events").insert({ booking_id: b.id, kind: "card_checkout_created" });
+      return { ok: true as const, url };
+    } catch (e) {
+      console.error(e);
+      return { ok: false as const, error: "Não foi possível abrir o pagamento com cartão agora. Tente novamente." };
+    }
+  });
+
+/** Status público da reserva. Enquanto pendente, consulta o Mercado Pago (fonte da verdade). */
 export const getBookingStatus = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => idSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: b } = await supabaseAdmin.from("bookings").select("id,status,mp_payment_id").eq("id", data.id).single();
-    if (b?.status === "pending" && b.mp_payment_id) {
+    const { data: b } = await supabaseAdmin.from("bookings").select("id,status,mp_payment_id,mp_checkout_url").eq("id", data.id).single();
+    if (b?.status === "pending" && (b.mp_payment_id || b.mp_checkout_url)) {
       try {
-        const { mpGetPayment } = await import("@/lib/mercadopago.server");
-        const p = await mpGetPayment(b.mp_payment_id);
-        if (p.external_reference === b.id) {
-          await supabaseAdmin.rpc("apply_payment_status", { _booking_id: b.id, _payment_id: String(p.id), _mp_status: p.status });
-        }
+        const { mpSearchByReference } = await import("@/lib/mercadopago.server");
+        const payments = await mpSearchByReference(b.id);
+        const p = payments.find((x) => x.status === "approved") ?? payments[0];
+        if (p) await supabaseAdmin.rpc("apply_payment_status", { _booking_id: b.id, _payment_id: String(p.id), _mp_status: p.status });
       } catch (e) {
         console.error("status refresh failed", e);
       }

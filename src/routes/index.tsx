@@ -3,9 +3,10 @@ import { useState } from "react";
 import { MapPin, Heart, Sparkles, Flower2, Menu, X, MessageCircle, Instagram, Camera } from "lucide-react";
 import {
   ADDRESS, LOGO, MAPS_EMBED, MAPS_URL, GENERAL_MESSAGE, INSTAGRAM_HANDLE, INSTAGRAM_URL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER,
-  gallery, photos, serviceMessage, services, testimonials, whatsappLink,
+  gallery, photos, serviceMessage, services, whatsappLink,
   type Category, type Photo,
 } from "@/content/site";
+import { Testimonials } from "@/components/testimonials";
 
 const TITLE = "Studio Talita Garcia | Cílios, Sobrancelhas, Unhas e Depilação";
 const DESC = "Studio de beleza com extensão de cílios, design de sobrancelhas, manicure, unhas em gel e acrílico e depilação. Agende pelo WhatsApp.";
@@ -190,26 +191,7 @@ function Index() {
 
         <section id="depoimentos" className="scroll-mt-20 px-5 py-24">
           <SectionTitle title="O que nossas clientes dizem" sub="Palavras de quem já viveu essa experiência." />
-          {testimonials.length ? (
-            <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
-              {testimonials.map((t, i) => (
-                <figure key={i} className="rounded-xl bg-card p-8">
-                  {t.stars && <p aria-label={`${t.stars} estrelas`} className="text-primary">{"★".repeat(t.stars)}</p>}
-                  <blockquote className="mt-3 font-serif text-xl italic">“{t.text}”</blockquote>
-                  <figcaption className="mt-4 text-sm text-muted-foreground">{t.name}</figcaption>
-                </figure>
-              ))}
-            </div>
-          ) : (
-            <div className="mx-auto max-w-xl rounded-xl bg-card p-10 text-center">
-              <p className="font-serif text-2xl italic">Já foi atendida no studio?</p>
-              <p className="mt-3 text-muted-foreground">Adoraríamos saber como foi a sua experiência. Compartilhe com a gente pelo WhatsApp ou Instagram.</p>
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
-                <a href={whatsappLink("Olá, Talita! Gostaria de compartilhar minha experiência no studio.")} target="_blank" rel="noopener noreferrer" className={btn}>Enviar pelo WhatsApp</a>
-                <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-primary px-6 py-3 text-sm text-primary">Instagram</a>
-              </div>
-            </div>
-          )}
+          <Testimonials />
         </section>
 
         <section className="px-5 pb-24">

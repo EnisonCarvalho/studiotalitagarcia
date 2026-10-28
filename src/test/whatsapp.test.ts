@@ -37,7 +37,10 @@ describe("real service photos", () => {
 
   it("fills the results gallery with real photos", () => {
     for (const item of gallery) expect(item.src).toBeTruthy();
-    expect(gallery.map((g) => g.category).sort()).toEqual(["Cílios", "Depilação", "Sobrancelhas", "Unhas"]);
+    expect(gallery.map((g) => g.category).sort()).toEqual(["Cílios", "Cílios", "Sobrancelhas", "Sobrancelhas", "Unhas", "Unhas"]);
+    expect(gallery.map((g) => g.src?.split("/").pop()).sort()).toEqual([
+      "cilios-fio-a-fio.png", "cilios-volumosos.png", "sobrancelhas-cilios-tg.png", "sobrancelhas-colagem.png", "unhas-azul.jpeg", "unhas-rosa.jpeg",
+    ]);
   });
 
   it("uses the rose gold logo", () => {

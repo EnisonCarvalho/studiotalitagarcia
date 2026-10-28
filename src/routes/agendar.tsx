@@ -30,7 +30,7 @@ export const Route = createFileRoute("/agendar")({
 });
 
 const steps = ["Serviço", "Data e horário", "Seus dados", "Revisão"];
-const pill = "inline-flex items-center justify-center gap-2 rounded-full bg-cta px-7 py-3.5 text-base font-semibold text-accent-foreground shadow-md transition hover:brightness-95 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+const pill = "inline-flex items-center justify-center gap-2 rounded-full bg-cta px-7 py-3.5 text-base font-semibold text-cta-foreground shadow-md transition hover:brightness-95 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 const ghost = "inline-flex items-center gap-2 rounded-full border border-border px-5 py-3 text-sm hover:border-primary";
 
 function Agendar() {

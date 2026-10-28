@@ -113,7 +113,7 @@ function Status() {
       ) : (
         <div className="mt-6 rounded-xl border border-border bg-card p-6 text-center">
           <p>{pixErr ?? "Não conseguimos gerar o Pix ainda."}</p>
-          <button onClick={retryPix} disabled={retrying} className="mt-4 inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3 font-semibold text-accent-foreground disabled:opacity-50">{retrying && <Loader2 className="h-4 w-4 animate-spin" />}Gerar Pix</button>
+          <button onClick={retryPix} disabled={retrying} className="mt-4 inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3 font-semibold text-cta-foreground disabled:opacity-50">{retrying && <Loader2 className="h-4 w-4 animate-spin" />}Gerar Pix</button>
         </div>
       )}
       {details}

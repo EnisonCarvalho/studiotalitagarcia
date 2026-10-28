@@ -3,9 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type ReactNode } from "react";
 import { CheckCircle2, Copy, CreditCard, Loader2, MessageCircle, XCircle } from "lucide-react";
-import { createCardCheckout, createPixPayment, getBookingStatus } from "@/lib/booking.functions";
+import { createCardPayment, createPixPayment, getBookingStatus, getPaymentConfig } from "@/lib/booking.functions";
 import { brl, fmtDateTime } from "@/lib/booking-rules";
 import { ADDRESS, LOGO, whatsappLink } from "@/content/site";
+import { CardPaymentBrick } from "@/components/card-payment-brick";
 
 export const Route = createFileRoute("/agendamento/$id")({
   head: () => ({
@@ -27,14 +28,13 @@ function Status() {
   const { id } = Route.useParams();
   const fetchStatus = useServerFn(getBookingStatus);
   const createPix = useServerFn(createPixPayment);
-  const createCard = useServerFn(createCardCheckout);
+  const payCardFn = useServerFn(createCardPayment);
+  const fetchConfig = useServerFn(getPaymentConfig);
+  const [method, setMethod] = useState<"pix" | "card">("pix");
   const [cardBusy, setCardBusy] = useState(false);
   const [cardErr, setCardErr] = useState<string | null>(null);
-  async function payCard() {
-    setCardBusy(true); setCardErr(null);
-    const r = await createCard({ data: { id } }).catch(() => ({ ok: false as const, error: "Falha de conexão. Tente novamente." }));
-    if (r.ok) window.location.href = r.url; else { setCardErr(r.error); setCardBusy(false); }
-  }
+  const [publicKey, setPublicKey] = useState<string | null>(null);
+  useEffect(() => { fetchConfig().then((c) => setPublicKey(c.publicKey)).catch(() => setPublicKey(null)); }, []);
   const [pixErr, setPixErr] = useState<string | null>(null);
   const [retrying, setRetrying] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -113,30 +113,56 @@ function Status() {
     <div>
       <h1 className="text-center text-4xl">Pague o sinal</h1>
       <p className="mt-2 text-center text-muted-foreground">Horário reservado por <strong className="text-foreground">{mm}:{ss}</strong>. Aguardando pagamento…</p>
-      <div className="mt-6 rounded-xl border border-border bg-card p-6 text-center">
-        <p className="text-2xl font-semibold text-primary">{brl(b.deposit_cents)}</p>
-        <button onClick={payCard} disabled={cardBusy} className="mt-4 inline-flex items-center gap-2 rounded-full bg-cta px-7 py-3.5 font-semibold text-cta-foreground shadow-md disabled:opacity-50">
-          {cardBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}Pagar sinal (Pix ou cartão)
-        </button>
-        <p className="mt-2 text-xs text-muted-foreground">Pagamento seguro pelo Mercado Pago.</p>
-        {cardErr && <p role="alert" className="mt-3 text-sm">{cardErr}</p>}
+      <div className="mt-6 rounded-xl border border-border bg-card p-6">
+        <p className="text-center text-2xl font-semibold text-primary">{brl(b.deposit_cents)}</p>
+        <div className="mt-4 grid grid-cols-2 gap-2 rounded-full border border-border p-1" role="tablist" aria-label="Forma de pagamento">
+          <button role="tab" aria-selected={method === "pix"} onClick={() => setMethod("pix")} className={`rounded-full px-4 py-2.5 text-sm font-semibold transition-colors ${method === "pix" ? "bg-cta text-cta-foreground" : "text-muted-foreground"}`}>Pix</button>
+          <button role="tab" aria-selected={method === "card"} onClick={() => setMethod("card")} className={`inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors ${method === "card" ? "bg-cta text-cta-foreground" : "text-muted-foreground"}`}><CreditCard className="h-4 w-4" />Cartão</button>
+        </div>
+        {method === "pix" ? (
+          <div className="mt-5 text-center">
+            {b.pix_qr_code ? (
+              <>
+                {b.pix_qr_base64 && <img src={`data:image/png;base64,${b.pix_qr_base64}`} alt="QR code Pix" className="mx-auto h-56 w-56" />}
+                <button onClick={() => { navigator.clipboard.writeText(b.pix_qr_code!); setCopied(true); }} className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary px-5 py-2.5 text-sm text-primary">
+                  <Copy className="h-4 w-4" />{copied ? "Código copiado!" : "Copiar código Pix"}
+                </button>
+                <p className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" />Aguardando pagamento — a confirmação aparece aqui automaticamente.</p>
+              </>
+            ) : pixErr ? (
+              <p className="text-sm text-muted-foreground">{pixErr}</p>
+            ) : (
+              <button onClick={retryPix} disabled={retrying} className="inline-flex items-center gap-2 text-sm text-primary underline-offset-4 hover:underline disabled:opacity-50">{retrying && <Loader2 className="h-4 w-4 animate-spin" />}Gerar QR code Pix</button>
+            )}
+          </div>
+        ) : (
+          <div className="mt-5">
+            {publicKey ? (
+              <CardPaymentBrick
+                publicKey={publicKey}
+                amountCents={b.deposit_cents}
+                onSubmit={async (form) => {
+                  setCardBusy(true); setCardErr(null);
+                  const r = await payCardFn({
+                    data: {
+                      id, token: form.token, paymentMethodId: form.payment_method_id, issuerId: form.issuer_id, installments: form.installments,
+                      payerEmail: form.payer?.email, identificationType: form.payer?.identification?.type, identificationNumber: form.payer?.identification?.number,
+                    },
+                  }).catch(() => ({ ok: false as const, error: "Falha de conexão. Tente novamente." }));
+                  if (r.ok) await q.refetch(); else setCardErr(r.error);
+                  setCardBusy(false);
+                }}
+                onError={(m) => setCardErr(m)}
+              />
+            ) : (
+              <p className="text-center text-sm text-muted-foreground">O pagamento com cartão ainda não foi ativado pelo studio. Use o Pix ou fale conosco pelo WhatsApp.</p>
+            )}
+            {cardBusy && <p className="mt-3 flex items-center justify-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />Processando pagamento…</p>}
+            {cardErr && <p role="alert" className="mt-3 text-center text-sm">{cardErr}</p>}
+          </div>
+        )}
+        <p className="mt-4 text-center text-xs text-muted-foreground">Pagamento seguro pelo Mercado Pago, sem sair desta página.</p>
       </div>
-      {b.pix_qr_code ? (
-        <div className="mt-4 rounded-xl border border-border bg-card p-6 text-center">
-          <p className="text-sm text-muted-foreground">Ou pague direto com o Pix abaixo</p>
-          {b.pix_qr_base64 && <img src={`data:image/png;base64,${b.pix_qr_base64}`} alt="QR code Pix" className="mx-auto mt-4 h-56 w-56" />}
-          <button onClick={() => { navigator.clipboard.writeText(b.pix_qr_code!); setCopied(true); }} className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary px-5 py-2.5 text-sm text-primary">
-            <Copy className="h-4 w-4" />{copied ? "Código copiado!" : "Copiar código Pix"}
-          </button>
-          <p className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" />A confirmação aparece aqui automaticamente após o pagamento.</p>
-        </div>
-      ) : pixErr ? (
-        <p className="mt-4 text-center text-sm text-muted-foreground">{pixErr}</p>
-      ) : (
-        <div className="mt-4 text-center">
-          <button onClick={retryPix} disabled={retrying} className="inline-flex items-center gap-2 text-sm text-primary underline-offset-4 hover:underline disabled:opacity-50">{retrying && <Loader2 className="h-4 w-4 animate-spin" />}Gerar QR code Pix aqui</button>
-        </div>
-      )}
       {details}
     </div>,
   );

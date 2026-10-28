@@ -63,29 +63,50 @@ export const createPixPayment = createServerFn({ method: "POST" })
     }
   });
 
-/** Gera o link de pagamento com cartão de crédito (Checkout Mercado Pago). */
-export const createCardCheckout = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => idSchema.parse(d))
+/** Configuração pública do pagamento (chave publishable do SDK; segura para o navegador). */
+export const getPaymentConfig = createServerFn({ method: "GET" }).handler(async () => {
+  const { mpPublicKey } = await import("@/lib/mercadopago.server");
+  return { publicKey: mpPublicKey() ?? null };
+});
+
+const cardSchema = z.object({
+  id: z.string().uuid(),
+  token: z.string().min(10).max(200),
+  paymentMethodId: z.string().min(2).max(30),
+  issuerId: z.union([z.string().max(30), z.number()]).nullish(),
+  installments: z.number().int().min(1).max(12),
+  payerEmail: z.string().email().max(200).optional(),
+  identificationType: z.string().max(10).optional(),
+  identificationNumber: z.string().max(20).optional(),
+});
+
+/** Processa o pagamento com cartão (Checkout Transparente). O token do cartão é gerado pelo SDK oficial no navegador. */
+export const createCardPayment = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => cardSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { mpCreateCheckoutPro, mpToken, payerEmail } = await import("@/lib/mercadopago.server");
+    const { mpCreateCardPayment, mpToken, payerEmail } = await import("@/lib/mercadopago.server");
     if (!mpToken()) return { ok: false as const, error: "O pagamento online ainda não foi ativado pelo studio. Fale conosco pelo WhatsApp." };
     const { data: b } = await supabaseAdmin.from("bookings").select("*").eq("id", data.id).single();
     if (!b) return { ok: false as const, error: "Reserva não encontrada." };
     if (b.status !== "pending" || !b.hold_expires_at || new Date(b.hold_expires_at) <= new Date())
       return { ok: false as const, error: "Essa reserva não está mais aguardando pagamento." };
-    if (b.mp_checkout_url) return { ok: true as const, url: b.mp_checkout_url };
     try {
-      const url = await mpCreateCheckoutPro({
-        bookingId: b.id, amountCents: b.deposit_cents, title: `Sinal - ${b.service_name}`, email: payerEmail(b.customer_email, b.id),
-        expiresAt: new Date(b.hold_expires_at), origin: new URL(getRequest().url).origin,
+      const p = await mpCreateCardPayment({
+        bookingId: b.id, amountCents: b.deposit_cents, description: `Sinal - ${b.service_name} - Studio Talita Garcia`,
+        email: data.payerEmail || payerEmail(b.customer_email, b.id),
+        token: data.token, paymentMethodId: data.paymentMethodId, issuerId: data.issuerId ?? undefined, installments: data.installments,
+        idempotencyKey: `${b.id}-card-${Date.now()}`,
       });
-      await supabaseAdmin.from("bookings").update({ mp_checkout_url: url }).eq("id", b.id);
-      await supabaseAdmin.from("booking_events").insert({ booking_id: b.id, kind: "card_checkout_created" });
-      return { ok: true as const, url };
+      await supabaseAdmin.from("bookings").update({ mp_payment_id: p.id, payment_status: p.status }).eq("id", b.id);
+      await supabaseAdmin.from("booking_events").insert({ booking_id: b.id, kind: "card_payment", data: { payment_id: p.id, status: p.status, detail: p.detail } });
+      await supabaseAdmin.rpc("apply_payment_status", { _booking_id: b.id, _payment_id: p.id, _mp_status: p.status });
+      if (p.status === "approved") return { ok: true as const, status: "approved" as const };
+      if (p.status === "rejected") return { ok: false as const, error: "Pagamento recusado pelo cartão. Confira os dados ou tente outro cartão." };
+      return { ok: false as const, error: "Pagamento em análise. Se for aprovado, a confirmação aparece aqui automaticamente." };
     } catch (e) {
       console.error(e);
-      return { ok: false as const, error: "Não foi possível abrir o pagamento agora. Tente novamente." };
+      return { ok: false as const, error: "Não foi possível processar o cartão agora. Tente novamente." };
     }
   });
 
@@ -94,8 +115,8 @@ export const getBookingStatus = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => idSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: b } = await supabaseAdmin.from("bookings").select("id,status,mp_payment_id,mp_checkout_url").eq("id", data.id).single();
-    if (b?.status === "pending" && (b.mp_payment_id || b.mp_checkout_url)) {
+    const { data: b } = await supabaseAdmin.from("bookings").select("id,status,mp_payment_id").eq("id", data.id).single();
+    if (b?.status === "pending" && b.mp_payment_id) {
       try {
         const { mpSearchByReference } = await import("@/lib/mercadopago.server");
         const payments = await mpSearchByReference(b.id);

@@ -1,4 +1,6 @@
 - [x] Agendamento online com reserva temporária e sem conflitos
-- [x] Painel da Talita (agenda, serviços, adicionais, horários, bloqueios, ajustes)
-- [x] Pagamento do sinal via Pix e cartão (Mercado Pago) — código pronto
-- [ ] Ativar Mercado Pago: aguardando Access Token e chave de assinatura do webhook
+- [x] Painel da Talita (agenda, serviços, adicionais, horários, bloqueios, ajustes) — testado
+- [x] E-mail opcional; animação de aproximação nas fotos dos serviços
+- [x] Checkout Pro (Pix ou cartão) + webhook com assinatura e confirmação só após aprovação
+- [ ] Ativar Mercado Pago: aguardando Access Token e assinatura secreta do webhook
+- [ ] Publicar e cadastrar o webhook no Mercado Pago Developers

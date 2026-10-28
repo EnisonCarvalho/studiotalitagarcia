@@ -95,7 +95,7 @@ export const createCardPayment = createServerFn({ method: "POST" })
       const p = await mpCreateCardPayment({
         bookingId: b.id, amountCents: b.deposit_cents, description: `Sinal - ${b.service_name} - Studio Talita Garcia`,
         email: data.payerEmail || payerEmail(b.customer_email, b.id),
-        token: data.token, paymentMethodId: data.paymentMethodId, issuerId: data.issuerId, installments: data.installments,
+        token: data.token, paymentMethodId: data.paymentMethodId, issuerId: data.issuerId ?? undefined, installments: data.installments,
         idempotencyKey: `${b.id}-card-${Date.now()}`,
       });
       await supabaseAdmin.from("bookings").update({ mp_payment_id: p.id, payment_status: p.status }).eq("id", b.id);

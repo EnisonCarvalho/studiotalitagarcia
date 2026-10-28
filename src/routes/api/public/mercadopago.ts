@@ -25,8 +25,14 @@ export const Route = createFileRoute("/api/public/mercadopago")({
           const ref = p.external_reference ?? "";
           if (!/^[0-9a-f-]{36}$/.test(ref)) return new Response("ok");
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data: booking } = await supabaseAdmin.from("bookings").select("deposit_cents").eq("id", ref).maybeSingle();
+          if (!booking || Math.round(p.transaction_amount * 100) !== booking.deposit_cents)
+            return new Response("payment mismatch", { status: 400 });
           const { error } = await supabaseAdmin.rpc("apply_payment_status", { _booking_id: ref, _payment_id: String(p.id), _mp_status: p.status });
-          if (error) console.error("apply_payment_status", error);
+          if (error) {
+            console.error("apply_payment_status failed");
+            return new Response("retry", { status: 500 });
+          }
           return new Response("ok");
         } catch (e) {
           console.error(e);

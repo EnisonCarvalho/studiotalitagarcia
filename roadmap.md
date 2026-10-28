@@ -3,6 +3,8 @@
 - [x] E-mail opcional; animação de aproximação nas fotos dos serviços
 - [x] Checkout transparente: Pix (QR na página) e cartão (Payment Brick), sem redirecionar nem exigir conta no Mercado Pago
 - [x] Webhook com assinatura e confirmação só após aprovação
-- [ ] Mercado Pago recusa o Access Token salvo (401 "Unauthorized use of live credentials") — ativar as credenciais de produção da aplicação no painel Mercado Pago Developers e salvar de novo
-- [ ] Publicar e cadastrar o webhook no Mercado Pago Developers
-- [ ] Teste real ponta a ponta (Pix e cartão) após publicar
+- [x] Atualizar Access Token e Public Key com formulário seguro; consulta somente leitura à conta retorna HTTP 200
+- [x] Revisar pagamentos de produção: API oficial sem sandbox, webhook canônico no Pix/cartão, identificação tokenizada, validação do valor e repetição segura do mesmo cartão; 13 testes passam
+- [x] Webhook publicado responde HTTP 401 a assinatura inválida; assinatura existente preservada
+- [ ] Publicar alterações e credenciais atualizadas — depende de pedido de publicação; confirmar mesma aplicação das duas credenciais e cadastro/assinatura no painel Mercado Pago Developers
+- [ ] Pagamento real de baixo valor com Pix e cartão — depende de autorização e ação da proprietária; não cobrar automaticamente

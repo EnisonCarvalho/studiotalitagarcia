@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
@@ -48,11 +47,10 @@ export const createPixPayment = createServerFn({ method: "POST" })
       return { ok: false as const, error: "Essa reserva não está mais aguardando pagamento." };
     if (b.mp_payment_id) return { ok: true as const };
     try {
-      const origin = new URL(getRequest().url).origin;
       const p = await mpCreatePix({
         bookingId: b.id, amountCents: b.deposit_cents, email: payerEmail(b.customer_email, b.id), name: b.customer_name,
         description: `Sinal - ${b.service_name} - Studio Talita Garcia`, expiresAt: new Date(b.hold_expires_at),
-        notificationUrl: `${origin}/api/public/mercadopago`,
+        notificationUrl: "https://studiotalitagarcia.lovable.app/api/public/mercadopago",
       });
       await supabaseAdmin.from("bookings").update({ mp_payment_id: p.id, payment_status: p.status, pix_qr_code: p.qr, pix_qr_base64: p.qrBase64 }).eq("id", b.id).is("mp_payment_id", null);
       await supabaseAdmin.from("booking_events").insert({ booking_id: b.id, kind: "pix_created", data: { payment_id: p.id } });
@@ -92,11 +90,14 @@ export const createCardPayment = createServerFn({ method: "POST" })
     if (b.status !== "pending" || !b.hold_expires_at || new Date(b.hold_expires_at) <= new Date())
       return { ok: false as const, error: "Essa reserva não está mais aguardando pagamento." };
     try {
+      const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${b.id}:${data.token}`));
+      const idempotencyKey = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
       const p = await mpCreateCardPayment({
         bookingId: b.id, amountCents: b.deposit_cents, description: `Sinal - ${b.service_name} - Studio Talita Garcia`,
         email: data.payerEmail || payerEmail(b.customer_email, b.id),
         token: data.token, paymentMethodId: data.paymentMethodId, issuerId: data.issuerId ?? undefined, installments: data.installments,
-        idempotencyKey: `${b.id}-card-${Date.now()}`,
+        identificationType: data.identificationType, identificationNumber: data.identificationNumber,
+        idempotencyKey,
       });
       await supabaseAdmin.from("bookings").update({ mp_payment_id: p.id, payment_status: p.status }).eq("id", b.id);
       await supabaseAdmin.from("booking_events").insert({ booking_id: b.id, kind: "card_payment", data: { payment_id: p.id, status: p.status, detail: p.detail } });
@@ -115,13 +116,17 @@ export const getBookingStatus = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => idSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: b } = await supabaseAdmin.from("bookings").select("id,status,mp_payment_id").eq("id", data.id).single();
+    const { data: b } = await supabaseAdmin.from("bookings").select("id,status,mp_payment_id,deposit_cents").eq("id", data.id).single();
     if (b?.status === "pending" && b.mp_payment_id) {
       try {
-        const { mpSearchByReference } = await import("@/lib/mercadopago.server");
+        const { mpSearchByReference, mpGetPayment } = await import("@/lib/mercadopago.server");
         const payments = await mpSearchByReference(b.id);
         const p = payments.find((x) => x.status === "approved") ?? payments[0];
-        if (p) await supabaseAdmin.rpc("apply_payment_status", { _booking_id: b.id, _payment_id: String(p.id), _mp_status: p.status });
+        if (p) {
+          const payment = await mpGetPayment(String(p.id));
+          if (payment.external_reference === b.id && Math.round(payment.transaction_amount * 100) === b.deposit_cents)
+            await supabaseAdmin.rpc("apply_payment_status", { _booking_id: b.id, _payment_id: String(payment.id), _mp_status: payment.status });
+        }
       } catch (e) {
         console.error("status refresh failed", e);
       }

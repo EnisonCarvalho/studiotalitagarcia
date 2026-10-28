@@ -1,4 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { catalogQuery } from "@/lib/catalog-query";
+import { brl } from "@/lib/booking-rules";
+import { CalendarHeart } from "lucide-react";
 import { useState } from "react";
 import { MapPin, Heart, Sparkles, Flower2, Menu, X, MessageCircle, Instagram, Camera } from "lucide-react";
 import {
@@ -30,10 +34,12 @@ export const Route = createFileRoute("/")({
       }),
     }],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(catalogQuery),
   component: Index,
 });
 
-const nav = [["Início", "inicio"], ["Sobre", "sobre"], ["Serviços", "servicos"], ["Resultados", "resultados"], ["Depoimentos", "depoimentos"], ["Contato", "contato"]];
+const nav = [["Início", "inicio"], ["Sobre", "sobre"], ["Serviços", "servicos"], ["Preços", "precos"], ["Resultados", "resultados"], ["Depoimentos", "depoimentos"], ["Contato", "contato"]];
+const cta = "inline-flex items-center justify-center gap-2 rounded-full bg-cta px-7 py-3.5 text-base font-semibold text-cta-foreground shadow-md transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 const btn = "inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium tracking-wide text-primary-foreground transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 
 function Img({ photo, className = "" }: { photo: Photo; className?: string }) {
@@ -62,7 +68,7 @@ function Header() {
         <Logo />
         <nav className="hidden items-center gap-7 lg:flex" aria-label="Principal">
           {nav.map(([l, id]) => <a key={id} href={`#${id}`} className="text-sm hover:text-primary">{l}</a>)}
-          <a href={whatsappLink(GENERAL_MESSAGE)} target="_blank" rel="noopener noreferrer" className={btn}><MessageCircle className="h-4 w-4" />Agendar pelo WhatsApp</a>
+          <Link to="/agendar" className={`${cta} px-5 py-2.5 text-sm`}><CalendarHeart className="h-4 w-4" />Agendar meu horário</Link>
         </nav>
         <button className="p-2 lg:hidden" aria-label={open ? "Fechar menu" : "Abrir menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? <X /> : <Menu />}
@@ -71,7 +77,7 @@ function Header() {
       {open && (
         <nav className="flex flex-col gap-1 border-t border-border px-5 pb-5 lg:hidden" aria-label="Menu móvel">
           {nav.map(([l, id]) => <a key={id} href={`#${id}`} onClick={() => setOpen(false)} className="py-3 text-base">{l}</a>)}
-          <a href={whatsappLink(GENERAL_MESSAGE)} target="_blank" rel="noopener noreferrer" className={`${btn} mt-2`}><MessageCircle className="h-4 w-4" />Agendar pelo WhatsApp</a>
+          <Link to="/agendar" className={`${cta} mt-2`}><CalendarHeart className="h-4 w-4" />Agendar meu horário</Link>
         </nav>
       )}
     </header>
@@ -85,6 +91,38 @@ function SectionTitle({ eyebrow, title, sub }: { eyebrow?: string; title: string
       <h2 className="text-4xl md:text-5xl">{title}</h2>
       <p className="mt-4 text-muted-foreground">{sub}</p>
     </div>
+  );
+}
+
+function Prices() {
+  const { data } = useQuery(catalogQuery);
+  const groups = new Map<string, NonNullable<typeof data>["services"]>();
+  for (const s of data?.services ?? []) groups.set(s.category, [...(groups.get(s.category) ?? []), s]);
+  return (
+    <section id="precos" className="scroll-mt-20 px-5 pb-24">
+      <SectionTitle eyebrow="Preços" title="Tabela de valores" sub="Escolha seu procedimento e agende online com sinal via Pix." />
+      {!data && <p className="text-center text-muted-foreground">Carregando valores…</p>}
+      <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {[...groups.entries()].map(([cat, list]) => (
+          <div key={cat} className="rounded-xl bg-card p-6">
+            <h3 className="text-2xl text-primary">{cat}</h3>
+            <ul className="mt-4 space-y-2 text-sm">
+              {list.map((s) => <li key={s.id} className="flex justify-between gap-3 border-b border-border/60 pb-2"><span>{s.name}</span><span className="font-medium whitespace-nowrap">{brl(s.price_cents)}</span></li>)}
+            </ul>
+          </div>
+        ))}
+        {data && data.addons.length > 0 && (
+          <div className="rounded-xl bg-card p-6">
+            <h3 className="text-2xl text-primary">Decoração de unhas</h3>
+            <p className="text-xs text-muted-foreground">Adicional aos serviços de unhas</p>
+            <ul className="mt-4 space-y-2 text-sm">
+              {data.addons.map((a) => <li key={a.id} className="flex justify-between gap-3 border-b border-border/60 pb-2"><span>{a.name}</span><span className="font-medium whitespace-nowrap">+ {brl(a.price_cents)}</span></li>)}
+            </ul>
+          </div>
+        )}
+      </div>
+      <div className="mt-10 text-center"><Link to="/agendar" className={cta}><CalendarHeart className="h-5 w-5" />Agendar meu horário</Link></div>
+    </section>
   );
 }
 
@@ -126,7 +164,7 @@ function Gallery() {
 function Index() {
   const wa = whatsappLink(GENERAL_MESSAGE);
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20 lg:pb-0">
       <Header />
       <main>
         <section id="inicio" className="scroll-mt-20 px-5 py-16 md:py-24">
@@ -135,7 +173,7 @@ function Index() {
               <p className="mb-5 text-xs uppercase tracking-[0.35em] text-primary">Studio Talita Garcia</p>
               <h1 className="text-5xl leading-[1.05] md:text-6xl lg:text-7xl">Realce sua beleza. <em className="text-primary">Valorize quem você é.</em></h1>
               <p className="mt-6 max-w-md text-lg text-muted-foreground">Cílios, sobrancelhas, unhas e depilação com carinho, cuidado e atenção aos detalhes.</p>
-              <a href={wa} target="_blank" rel="noopener noreferrer" className={`${btn} mt-8`}>Agendar meu horário</a>
+              <div className="mt-8 flex flex-wrap items-center gap-4"><Link to="/agendar" className={`${cta} px-9 py-4 text-lg`}><CalendarHeart className="h-5 w-5" />Agendar meu horário</Link><a href={wa} target="_blank" rel="noopener noreferrer" className="text-sm text-primary underline-offset-4 hover:underline">ou fale pelo WhatsApp</a></div>
               <ul className="mt-10 grid grid-cols-3 gap-4 border-t border-border pt-6 text-sm">
                 {[[Heart, "Atendimento personalizado"], [Flower2, "Ambiente acolhedor"], [Sparkles, "Cuidado em cada detalhe"]].map(([I, t]) => {
                   const Icon = I as typeof Heart;
@@ -179,13 +217,15 @@ function Index() {
                 <div className="flex flex-1 flex-col p-3">
                   <h3 className="text-2xl">{s.title}</h3>
                   <p className="mt-2 flex-1 text-sm text-muted-foreground">{s.description}</p>
-                  <a href={whatsappLink(serviceMessage(s.term))} target="_blank" rel="noopener noreferrer" className="mt-4 text-sm font-medium text-primary underline-offset-4 hover:underline">Saiba mais →</a>
-                  <a href={whatsappLink(serviceMessage(s.term))} target="_blank" rel="noopener noreferrer" className={`${btn} mt-3 py-2.5`}>Agendar {s.title.toLowerCase()}</a>
+                  <a href={whatsappLink(serviceMessage(s.term))} target="_blank" rel="noopener noreferrer" className="mt-4 text-sm font-medium text-primary underline-offset-4 hover:underline">Tirar dúvidas no WhatsApp →</a>
+                  <Link to="/agendar" search={{ categoria: s.title }} className={`${cta} mt-3 px-4 py-2.5 text-sm`}>Agendar meu horário</Link>
                 </div>
               </article>
             ))}
           </div>
         </section>
+
+        <Prices />
 
         <div className="bg-secondary"><Gallery /></div>
 
@@ -202,7 +242,7 @@ function Index() {
             <div className="p-10 md:p-16">
               <h2 className="text-4xl md:text-5xl">Você merece esse momento.</h2>
               <p className="mt-4 text-muted-foreground">Reserve um tempo para você. Será um prazer fazer parte da sua jornada de beleza.</p>
-              <a href={wa} target="_blank" rel="noopener noreferrer" className={`${btn} mt-8 px-8 py-4 text-base`}><MessageCircle className="h-5 w-5" />Agendar pelo WhatsApp</a>
+              <div className="mt-8 flex flex-wrap gap-3"><Link to="/agendar" className={cta}><CalendarHeart className="h-5 w-5" />Agendar meu horário</Link><a href={wa} target="_blank" rel="noopener noreferrer" className={btn}><MessageCircle className="h-4 w-4" />WhatsApp</a></div>
               <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="mt-6 flex items-center gap-2 text-sm text-primary hover:underline"><MapPin className="h-4 w-4" />{ADDRESS} · Abrir no mapa</a>
             </div>
           </div>
@@ -225,9 +265,13 @@ function Index() {
         <p className="mt-12 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} Studio Talita Garcia</p>
       </footer>
 
-      <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="Conversar no WhatsApp" className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition hover:scale-105">
+      <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="Conversar no WhatsApp" className="fixed bottom-24 right-5 z-40 flex h-14 w-14 lg:bottom-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition hover:scale-105">
         <MessageCircle className="h-6 w-6" />
       </a>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-5 py-3 backdrop-blur lg:hidden">
+        <Link to="/agendar" className={`${cta} w-full`}><CalendarHeart className="h-5 w-5" />Agendar meu horário</Link>
+      </div>
     </div>
   );
 }

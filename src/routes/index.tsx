@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Heart, Sparkles, Flower2, Menu, X, MessageCircle, Instagram, Camera } from "lucide-react";
+import { MapPin, Heart, Sparkles, Flower2, Menu, X, MessageCircle, Instagram, Camera } from "lucide-react";
 import {
-  GENERAL_MESSAGE, INSTAGRAM_HANDLE, INSTAGRAM_URL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER,
+  ADDRESS, MAPS_EMBED, MAPS_URL, GENERAL_MESSAGE, INSTAGRAM_HANDLE, INSTAGRAM_URL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER,
   gallery, photos, serviceMessage, services, testimonials, whatsappLink,
   type Category, type Photo,
 } from "@/content/site";
@@ -25,6 +25,7 @@ export const Route = createFileRoute("/")({
       children: JSON.stringify({
         "@context": "https://schema.org", "@type": "BeautySalon", name: "Studio Talita Garcia",
         telephone: `+${WHATSAPP_NUMBER}`, sameAs: [INSTAGRAM_URL],
+        address: { "@type": "PostalAddress", streetAddress: "Rua Morada Nova, 142", addressLocality: "Fortaleza", addressRegion: "CE", addressCountry: "BR" },
       }),
     }],
   }),
@@ -142,7 +143,10 @@ function Index() {
                 })}
               </ul>
             </div>
-            <div className="reveal aspect-[4/5]"><Img photo={photos.hero} /></div>
+            <div className="reveal relative aspect-[4/5] overflow-hidden rounded-xl">
+              <img src={photos.hero.src} alt={photos.hero.alt} className="h-full w-full object-cover object-top" />
+              <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-background" />
+            </div>
           </div>
         </section>
 
@@ -211,11 +215,14 @@ function Index() {
 
         <section className="px-5 pb-24">
           <div className="mx-auto grid max-w-6xl overflow-hidden rounded-2xl bg-blush md:grid-cols-2">
-            <div className="min-h-72"><Img photo={photos.cta} className="rounded-none" /></div>
+            <div className="relative min-h-72">
+              <iframe title={`Mapa: ${ADDRESS}`} src={MAPS_EMBED} loading="lazy" className="absolute inset-0 h-full w-full border-0" referrerPolicy="no-referrer-when-downgrade" />
+            </div>
             <div className="p-10 md:p-16">
               <h2 className="text-4xl md:text-5xl">Você merece esse momento.</h2>
               <p className="mt-4 text-muted-foreground">Reserve um tempo para você. Será um prazer fazer parte da sua jornada de beleza.</p>
               <a href={wa} target="_blank" rel="noopener noreferrer" className={`${btn} mt-8 px-8 py-4 text-base`}><MessageCircle className="h-5 w-5" />Agendar pelo WhatsApp</a>
+              <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="mt-6 flex items-center gap-2 text-sm text-primary hover:underline"><MapPin className="h-4 w-4" />{ADDRESS} · Abrir no mapa</a>
             </div>
           </div>
         </section>
@@ -228,6 +235,7 @@ function Index() {
             <p className="font-medium">Contato</p>
             <a href={wa} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary"><MessageCircle className="h-4 w-4" />{WHATSAPP_DISPLAY}</a>
             <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary"><Instagram className="h-4 w-4" />{INSTAGRAM_HANDLE}</a>
+            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary"><MapPin className="h-4 w-4" />{ADDRESS}</a>
           </div>
           <nav className="grid grid-cols-2 gap-2 text-sm" aria-label="Rodapé">
             {nav.map(([l, id]) => <a key={id} href={`#${id}`} className="hover:text-primary">{l}</a>)}

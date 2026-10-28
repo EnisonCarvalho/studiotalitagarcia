@@ -1,5 +1,6 @@
 // Mercado Pago (server-only). Credenciais vêm de variáveis secretas.
 const API = "https://api.mercadopago.com";
+const PAYMENT_NOTIFICATION_URL = "https://studiotalitagarcia.lovable.app/api/public/mercadopago";
 
 export function mpToken() {
   return process.env["MERCADOPAGO_ACCESS_TOKEN"];
@@ -32,8 +33,6 @@ export async function mpCreatePix(input: {
   const token = mpToken();
   if (!token) throw new Error("payment_not_configured");
   const [first, ...rest] = input.name.split(" ");
-  // O Mercado Pago só aceita notification_url HTTPS pública; em localhost omitimos (a página consulta o status sozinha).
-  const notificationUrl = /^https:\/\/(?!localhost|127\.)/.test(input.notificationUrl) ? input.notificationUrl : undefined;
   const res = await fetch(`${API}/v1/payments`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "X-Idempotency-Key": input.bookingId },
@@ -42,17 +41,19 @@ export async function mpCreatePix(input: {
       description: input.description,
       payment_method_id: "pix",
       external_reference: input.bookingId,
-      ...(notificationUrl ? { notification_url: notificationUrl } : {}),
+      notification_url: PAYMENT_NOTIFICATION_URL,
       date_of_expiration: mpDate(input.expiresAt),
       payer: { email: input.email, first_name: first, last_name: rest.join(" ") || first },
     }),
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
-    console.error("Mercado Pago create failed", res.status, body);
+    console.error("Mercado Pago create failed", res.status);
     throw new Error("mp_create_failed");
   }
   const tx = body?.point_of_interaction?.transaction_data ?? {};
+  if (!body.id || typeof tx.qr_code !== "string" || !tx.qr_code || typeof tx.qr_code_base64 !== "string" || !tx.qr_code_base64)
+    throw new Error("mp_pix_qr_missing");
   return { id: String(body.id), status: String(body.status), qr: tx.qr_code as string, qrBase64: tx.qr_code_base64 as string };
 }
 
@@ -83,6 +84,7 @@ export function payerEmail(email: string, bookingId: string) {
 export async function mpCreateCardPayment(input: {
   bookingId: string; amountCents: number; description: string; email: string;
   token: string; paymentMethodId: string; issuerId?: string | number | undefined; installments: number; idempotencyKey: string;
+  identificationType?: string; identificationNumber?: string;
 }) {
   const token = mpToken();
   if (!token) throw new Error("payment_not_configured");
@@ -97,13 +99,19 @@ export async function mpCreateCardPayment(input: {
       ...(input.issuerId != null && input.issuerId !== "" ? { issuer_id: Number(input.issuerId) } : {}),
       installments: Math.max(1, Math.min(12, Math.floor(input.installments))),
       external_reference: input.bookingId,
+      notification_url: PAYMENT_NOTIFICATION_URL,
       statement_descriptor: "TALITA GARCIA",
-      payer: { email: input.email },
+      payer: {
+        email: input.email,
+        ...(input.identificationType && input.identificationNumber ? {
+          identification: { type: input.identificationType, number: input.identificationNumber },
+        } : {}),
+      },
     }),
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
-    console.error("Mercado Pago card payment failed", res.status, body);
+    console.error("Mercado Pago card payment failed", res.status);
     throw new Error("mp_card_failed");
   }
   return { id: String(body.id), status: String(body.status), detail: String(body.status_detail ?? "") };

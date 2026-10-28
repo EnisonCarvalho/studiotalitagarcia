@@ -49,8 +49,7 @@ export function CardPaymentBrick(props: {
       onSubmit={async ({ formData }) => {
         await props.onSubmit(formData as BrickFormData);
       }}
-      onError={(e) => {
-        console.error("brick error", e);
+      onError={() => {
         props.onError("Não foi possível carregar o pagamento com cartão. Tente o Pix.");
       }}
       onReady={() => undefined}

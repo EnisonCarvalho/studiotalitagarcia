@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
@@ -48,11 +47,10 @@ export const createPixPayment = createServerFn({ method: "POST" })
       return { ok: false as const, error: "Essa reserva não está mais aguardando pagamento." };
     if (b.mp_payment_id) return { ok: true as const };
     try {
-      const origin = new URL(getRequest().url).origin;
       const p = await mpCreatePix({
         bookingId: b.id, amountCents: b.deposit_cents, email: payerEmail(b.customer_email, b.id), name: b.customer_name,
         description: `Sinal - ${b.service_name} - Studio Talita Garcia`, expiresAt: new Date(b.hold_expires_at),
-        notificationUrl: `${origin}/api/public/mercadopago`,
+        notificationUrl: "https://studiotalitagarcia.lovable.app/api/public/mercadopago",
       });
       await supabaseAdmin.from("bookings").update({ mp_payment_id: p.id, payment_status: p.status, pix_qr_code: p.qr, pix_qr_base64: p.qrBase64 }).eq("id", b.id).is("mp_payment_id", null);
       await supabaseAdmin.from("booking_events").insert({ booking_id: b.id, kind: "pix_created", data: { payment_id: p.id } });
@@ -96,7 +94,8 @@ export const createCardPayment = createServerFn({ method: "POST" })
         bookingId: b.id, amountCents: b.deposit_cents, description: `Sinal - ${b.service_name} - Studio Talita Garcia`,
         email: data.payerEmail || payerEmail(b.customer_email, b.id),
         token: data.token, paymentMethodId: data.paymentMethodId, issuerId: data.issuerId ?? undefined, installments: data.installments,
-        idempotencyKey: `${b.id}-card-${Date.now()}`,
+        identificationType: data.identificationType, identificationNumber: data.identificationNumber,
+        idempotencyKey: `${b.id}-card-${data.token}`,
       });
       await supabaseAdmin.from("bookings").update({ mp_payment_id: p.id, payment_status: p.status }).eq("id", b.id);
       await supabaseAdmin.from("booking_events").insert({ booking_id: b.id, kind: "card_payment", data: { payment_id: p.id, status: p.status, detail: p.detail } });

@@ -32,6 +32,8 @@ export async function mpCreatePix(input: {
   const token = mpToken();
   if (!token) throw new Error("payment_not_configured");
   const [first, ...rest] = input.name.split(" ");
+  // O Mercado Pago só aceita notification_url HTTPS pública; em localhost omitimos (a página consulta o status sozinha).
+  const notificationUrl = /^https:\/\/(?!localhost|127\.)/.test(input.notificationUrl) ? input.notificationUrl : undefined;
   const res = await fetch(`${API}/v1/payments`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "X-Idempotency-Key": input.bookingId },
@@ -40,7 +42,7 @@ export async function mpCreatePix(input: {
       description: input.description,
       payment_method_id: "pix",
       external_reference: input.bookingId,
-      notification_url: input.notificationUrl,
+      ...(notificationUrl ? { notification_url: notificationUrl } : {}),
       date_of_expiration: mpDate(input.expiresAt),
       payer: { email: input.email, first_name: first, last_name: rest.join(" ") || first },
     }),

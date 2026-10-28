@@ -2,7 +2,7 @@
 - [x] Painel da Talita (agenda, serviços, adicionais, horários, bloqueios, ajustes) — testado
 - [x] E-mail opcional; animação de aproximação nas fotos dos serviços
 - [x] Checkout transparente: Pix (QR na página) e cartão (Payment Brick), sem redirecionar nem exigir conta no Mercado Pago
-- [x] Webhook com assinatura e confirmação só após aprovação; Access Token e assinatura secreta salvos
-- [ ] Configurar a chave pública do Mercado Pago (MERCADOPAGO_PUBLIC_KEY) para ativar o pagamento com cartão
+- [x] Webhook com assinatura e confirmação só após aprovação
+- [ ] Mercado Pago recusa o Access Token salvo (401 "Unauthorized use of live credentials") — ativar as credenciais de produção da aplicação no painel Mercado Pago Developers e salvar de novo
 - [ ] Publicar e cadastrar o webhook no Mercado Pago Developers
 - [ ] Teste real ponta a ponta (Pix e cartão) após publicar

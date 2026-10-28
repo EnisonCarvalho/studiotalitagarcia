@@ -5,6 +5,11 @@ export function mpToken() {
   return process.env["MERCADOPAGO_ACCESS_TOKEN"];
 }
 
+/** Chave pública (publishable) usada pelo SDK no navegador para tokenizar o cartão. */
+export function mpPublicKey() {
+  return process.env["MERCADOPAGO_PUBLIC_KEY"];
+}
+
 export async function mpGetPayment(id: string) {
   const token = mpToken();
   if (!token) throw new Error("payment_not_configured");
@@ -72,32 +77,34 @@ export function payerEmail(email: string, bookingId: string) {
   return email || `cliente.${bookingId.slice(0, 8)}@studiotalitagarcia.lovable.app`;
 }
 
-/** Checkout Pro do Mercado Pago (Pix ou cartão de crédito). */
-export async function mpCreateCheckoutPro(input: {
-  bookingId: string; amountCents: number; title: string; email: string; expiresAt: Date; origin: string;
+/** Pagamento com cartão via Checkout Transparente: o token vem do SDK oficial no navegador (nunca recebemos número/CVV). */
+export async function mpCreateCardPayment(input: {
+  bookingId: string; amountCents: number; description: string; email: string;
+  token: string; paymentMethodId: string; issuerId?: string | number; installments: number; idempotencyKey: string;
 }) {
   const token = mpToken();
   if (!token) throw new Error("payment_not_configured");
-  const back = `${input.origin}/agendamento/${input.bookingId}`;
-  const res = await fetch(`${API}/checkout/preferences`, {
+  const res = await fetch(`${API}/v1/payments`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "X-Idempotency-Key": input.idempotencyKey },
     body: JSON.stringify({
-      items: [{ id: input.bookingId, title: input.title, quantity: 1, currency_id: "BRL", unit_price: input.amountCents / 100 }],
-      payer: { email: input.email },
+      transaction_amount: input.amountCents / 100,
+      description: input.description,
+      token: input.token,
+      payment_method_id: input.paymentMethodId,
+      ...(input.issuerId != null && input.issuerId !== "" ? { issuer_id: Number(input.issuerId) } : {}),
+      installments: Math.max(1, Math.min(12, Math.floor(input.installments))),
       external_reference: input.bookingId,
-      notification_url: `${input.origin}/api/public/mercadopago`,
-      back_urls: { success: back, pending: back, failure: back },
-      auto_return: "approved",
-      expires: true,
-      expiration_date_to: mpDate(input.expiresAt),
-      payment_methods: { excluded_payment_types: [{ id: "ticket" }, { id: "atm" }], installments: 1 },
       statement_descriptor: "TALITA GARCIA",
+      payer: { email: input.email },
     }),
   });
   const body = await res.json().catch(() => ({}));
-  if (!res.ok) { console.error("Mercado Pago preference failed", res.status, body); throw new Error("mp_pref_failed"); }
-  return String(body.init_point);
+  if (!res.ok) {
+    console.error("Mercado Pago card payment failed", res.status, body);
+    throw new Error("mp_card_failed");
+  }
+  return { id: String(body.id), status: String(body.status), detail: String(body.status_detail ?? "") };
 }
 
 /** Pagamentos vinculados a uma reserva (consulta direta na API = fonte da verdade). */

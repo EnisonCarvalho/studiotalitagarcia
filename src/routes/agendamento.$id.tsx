@@ -78,7 +78,7 @@ function Status() {
         <p className="mt-2 text-muted-foreground">{b.customer_name}, recebemos seu sinal de {brl(b.deposit_cents)}. O restante de {brl(b.balance_cents)} é pago no atendimento.</p>
         <div className="text-left">{details}</div>
         <p className="mt-4 text-sm text-muted-foreground">Endereço: {ADDRESS}. Chegue com alguns minutos de antecedência.</p>
-        <a href={whatsappLink(msg)} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 font-semibold text-accent-foreground"><MessageCircle className="h-5 w-5" />Enviar confirmação pelo WhatsApp</a>
+        <a href={whatsappLink(msg)} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-full bg-cta px-7 py-3.5 font-semibold text-cta-foreground"><MessageCircle className="h-5 w-5" />Enviar confirmação pelo WhatsApp</a>
       </div>,
     );
   }
@@ -89,7 +89,7 @@ function Status() {
         <XCircle className="mx-auto h-14 w-14 text-muted-foreground" strokeWidth={1.3} />
         <h1 className="mt-4 text-4xl">{b.status === "expired" ? "O tempo da reserva acabou" : "Reserva não confirmada"}</h1>
         <p className="mt-2 text-muted-foreground">{b.payment_status === "approved_conflict" ? "Seu pagamento chegou depois que o horário foi liberado. Fale com a Talita pelo WhatsApp para remarcar ou receber o estorno." : "O pagamento não foi concluído e o horário foi liberado. Você pode escolher outro horário."}</p>
-        <Link to="/agendar" className="mt-6 inline-flex rounded-full bg-accent px-7 py-3.5 font-semibold text-accent-foreground">Escolher outro horário</Link>
+        <Link to="/agendar" className="mt-6 inline-flex rounded-full bg-cta px-7 py-3.5 font-semibold text-cta-foreground">Escolher outro horário</Link>
       </div>,
     );
   }
@@ -113,7 +113,7 @@ function Status() {
       ) : (
         <div className="mt-6 rounded-xl border border-border bg-card p-6 text-center">
           <p>{pixErr ?? "Não conseguimos gerar o Pix ainda."}</p>
-          <button onClick={retryPix} disabled={retrying} className="mt-4 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 font-semibold text-accent-foreground disabled:opacity-50">{retrying && <Loader2 className="h-4 w-4 animate-spin" />}Gerar Pix</button>
+          <button onClick={retryPix} disabled={retrying} className="mt-4 inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3 font-semibold text-accent-foreground disabled:opacity-50">{retrying && <Loader2 className="h-4 w-4 animate-spin" />}Gerar Pix</button>
         </div>
       )}
       {details}

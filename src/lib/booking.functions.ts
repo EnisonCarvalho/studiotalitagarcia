@@ -115,8 +115,8 @@ export const getBookingStatus = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => idSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: b } = await supabaseAdmin.from("bookings").select("id,status,mp_payment_id,mp_checkout_url").eq("id", data.id).single();
-    if (b?.status === "pending" && (b.mp_payment_id || b.mp_checkout_url)) {
+    const { data: b } = await supabaseAdmin.from("bookings").select("id,status,mp_payment_id").eq("id", data.id).single();
+    if (b?.status === "pending" && b.mp_payment_id) {
       try {
         const { mpSearchByReference } = await import("@/lib/mercadopago.server");
         const payments = await mpSearchByReference(b.id);

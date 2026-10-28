@@ -84,7 +84,7 @@ export function payerEmail(email: string, bookingId: string) {
 export async function mpCreateCardPayment(input: {
   bookingId: string; amountCents: number; description: string; email: string;
   token: string; paymentMethodId: string; issuerId?: string | number | undefined; installments: number; idempotencyKey: string;
-  identificationType?: string; identificationNumber?: string;
+  identificationType?: string | undefined; identificationNumber?: string | undefined;
 }) {
   const token = mpToken();
   if (!token) throw new Error("payment_not_configured");

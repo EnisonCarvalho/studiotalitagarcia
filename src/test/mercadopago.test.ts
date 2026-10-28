@@ -15,7 +15,9 @@ describe("pagamentos reais sem redirecionamento", () => {
     const fetchMock = vi.fn().mockResolvedValue(Response.json({ id: 123, status: "pending", point_of_interaction: { transaction_data: { qr_code: "unit-qr", qr_code_base64: "unit-image" } } }));
     vi.stubGlobal("fetch", fetchMock);
     const result = await mpCreatePix({ ...input, name: "Cliente", expiresAt: new Date("2026-10-29T12:15:00Z"), notificationUrl: "http://localhost:8080/api/public/mercadopago" });
-    const [url, options] = fetchMock.mock.calls[0];
+    const call = fetchMock.mock.calls[0];
+    if (!call) throw new Error("Pix request missing");
+    const [url, options] = call;
     const body = JSON.parse(options.body);
     expect(url).toBe("https://api.mercadopago.com/v1/payments");
     expect(body.transaction_amount).toBe(12.5);
@@ -38,7 +40,9 @@ describe("pagamentos reais sem redirecionamento", () => {
     const fetchMock = vi.fn().mockResolvedValue(Response.json({ id: 124, status: "pending" }));
     vi.stubGlobal("fetch", fetchMock);
     const result = await mpCreateCardPayment({ ...input, token: "unit-card-token", paymentMethodId: "visa", installments: 1, idempotencyKey: "unit-attempt", identificationType: "CPF", identificationNumber: "00000000000" });
-    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    const call = fetchMock.mock.calls[0];
+    if (!call) throw new Error("Card request missing");
+    const body = JSON.parse(call[1].body);
     expect(body.notification_url).toBe("https://studiotalitagarcia.lovable.app/api/public/mercadopago");
     expect(body.payer.identification).toEqual({ type: "CPF", number: "00000000000" });
     expect(body.external_reference).toBe(input.bookingId);

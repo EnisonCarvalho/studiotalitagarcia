@@ -7,8 +7,8 @@ export const Route = createFileRoute("/api/public/mercadopago")({
       POST: async ({ request }) => {
         const url = new URL(request.url);
         const body = (await request.json().catch(() => ({}))) as { type?: string; data?: { id?: string | number } };
-        const dataId = String(url.searchParams.get("data.id") ?? body?.data?.id ?? "");
-        const type = url.searchParams.get("type") ?? body?.type;
+        const dataId = String(url.searchParams.get("data.id") ?? body?.data?.id ?? url.searchParams.get("id") ?? "");
+        const type = url.searchParams.get("type") ?? url.searchParams.get("topic") ?? body?.type;
         if (!/^\d{1,30}$/.test(dataId)) return new Response("ignored", { status: 200 });
 
         const secret = process.env["MERCADOPAGO_WEBHOOK_SECRET"];

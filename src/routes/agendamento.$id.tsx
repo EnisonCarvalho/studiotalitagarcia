@@ -113,28 +113,30 @@ function Status() {
     <div>
       <h1 className="text-center text-4xl">Pague o sinal</h1>
       <p className="mt-2 text-center text-muted-foreground">Horário reservado por <strong className="text-foreground">{mm}:{ss}</strong>. Aguardando pagamento…</p>
+      <div className="mt-6 rounded-xl border border-border bg-card p-6 text-center">
+        <p className="text-2xl font-semibold text-primary">{brl(b.deposit_cents)}</p>
+        <button onClick={payCard} disabled={cardBusy} className="mt-4 inline-flex items-center gap-2 rounded-full bg-cta px-7 py-3.5 font-semibold text-cta-foreground shadow-md disabled:opacity-50">
+          {cardBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}Pagar sinal (Pix ou cartão)
+        </button>
+        <p className="mt-2 text-xs text-muted-foreground">Pagamento seguro pelo Mercado Pago.</p>
+        {cardErr && <p role="alert" className="mt-3 text-sm">{cardErr}</p>}
+      </div>
       {b.pix_qr_code ? (
-        <div className="mt-6 rounded-xl border border-border bg-card p-6 text-center">
-          <p className="text-2xl font-semibold text-primary">{brl(b.deposit_cents)}</p>
+        <div className="mt-4 rounded-xl border border-border bg-card p-6 text-center">
+          <p className="text-sm text-muted-foreground">Ou pague direto com o Pix abaixo</p>
           {b.pix_qr_base64 && <img src={`data:image/png;base64,${b.pix_qr_base64}`} alt="QR code Pix" className="mx-auto mt-4 h-56 w-56" />}
           <button onClick={() => { navigator.clipboard.writeText(b.pix_qr_code!); setCopied(true); }} className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary px-5 py-2.5 text-sm text-primary">
             <Copy className="h-4 w-4" />{copied ? "Código copiado!" : "Copiar código Pix"}
           </button>
           <p className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" />A confirmação aparece aqui automaticamente após o pagamento.</p>
         </div>
+      ) : pixErr ? (
+        <p className="mt-4 text-center text-sm text-muted-foreground">{pixErr}</p>
       ) : (
-        <div className="mt-6 rounded-xl border border-border bg-card p-6 text-center">
-          <p>{pixErr ?? "Não conseguimos gerar o Pix ainda."}</p>
-          <button onClick={retryPix} disabled={retrying} className="mt-4 inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3 font-semibold text-cta-foreground disabled:opacity-50">{retrying && <Loader2 className="h-4 w-4 animate-spin" />}Gerar Pix</button>
+        <div className="mt-4 text-center">
+          <button onClick={retryPix} disabled={retrying} className="inline-flex items-center gap-2 text-sm text-primary underline-offset-4 hover:underline disabled:opacity-50">{retrying && <Loader2 className="h-4 w-4 animate-spin" />}Gerar QR code Pix aqui</button>
         </div>
       )}
-      <div className="mt-4 rounded-xl border border-border bg-card p-6 text-center">
-        <p className="text-sm text-muted-foreground">Prefere cartão de crédito?</p>
-        <button onClick={payCard} disabled={cardBusy} className="mt-3 inline-flex items-center gap-2 rounded-full border border-primary px-6 py-3 text-sm font-medium text-primary disabled:opacity-50">
-          {cardBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}Pagar sinal com cartão
-        </button>
-        {cardErr && <p role="alert" className="mt-3 text-sm">{cardErr}</p>}
-      </div>
       {details}
     </div>,
   );

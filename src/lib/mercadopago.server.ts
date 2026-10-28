@@ -72,8 +72,8 @@ export function payerEmail(email: string, bookingId: string) {
   return email || `cliente.${bookingId.slice(0, 8)}@studiotalitagarcia.lovable.app`;
 }
 
-/** Checkout do Mercado Pago (cartão de crédito). */
-export async function mpCreateCardCheckout(input: {
+/** Checkout Pro do Mercado Pago (Pix ou cartão de crédito). */
+export async function mpCreateCheckoutPro(input: {
   bookingId: string; amountCents: number; title: string; email: string; expiresAt: Date; origin: string;
 }) {
   const token = mpToken();
@@ -91,7 +91,7 @@ export async function mpCreateCardCheckout(input: {
       auto_return: "approved",
       expires: true,
       expiration_date_to: mpDate(input.expiresAt),
-      payment_methods: { excluded_payment_types: [{ id: "ticket" }, { id: "atm" }, { id: "bank_transfer" }], installments: 1 },
+      payment_methods: { excluded_payment_types: [{ id: "ticket" }, { id: "atm" }], installments: 1 },
       statement_descriptor: "TALITA GARCIA",
     }),
   });

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -35,7 +35,7 @@ function AuthPage() {
     return () => data.subscription.unsubscribe();
   }, [navigate]);
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault(); setBusy(true); setMsg(null);
     if (mode === "in") {
       const { error } = await supabase.auth.signInWithPassword({ email, password });

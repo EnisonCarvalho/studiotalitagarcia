@@ -116,13 +116,17 @@ export const getBookingStatus = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => idSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: b } = await supabaseAdmin.from("bookings").select("id,status,mp_payment_id").eq("id", data.id).single();
+    const { data: b } = await supabaseAdmin.from("bookings").select("id,status,mp_payment_id,deposit_cents").eq("id", data.id).single();
     if (b?.status === "pending" && b.mp_payment_id) {
       try {
-        const { mpSearchByReference } = await import("@/lib/mercadopago.server");
+        const { mpSearchByReference, mpGetPayment } = await import("@/lib/mercadopago.server");
         const payments = await mpSearchByReference(b.id);
         const p = payments.find((x) => x.status === "approved") ?? payments[0];
-        if (p) await supabaseAdmin.rpc("apply_payment_status", { _booking_id: b.id, _payment_id: String(p.id), _mp_status: p.status });
+        if (p) {
+          const payment = await mpGetPayment(String(p.id));
+          if (payment.external_reference === b.id && Math.round(payment.transaction_amount * 100) === b.deposit_cents)
+            await supabaseAdmin.rpc("apply_payment_status", { _booking_id: b.id, _payment_id: String(payment.id), _mp_status: payment.status });
+        }
       } catch (e) {
         console.error("status refresh failed", e);
       }

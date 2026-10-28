@@ -90,6 +90,7 @@ export type Database = {
           ends_at: string
           hold_expires_at: string | null
           id: string
+          mp_checkout_url: string | null
           mp_payment_id: string | null
           paid_at: string | null
           payment_status: string
@@ -115,6 +116,7 @@ export type Database = {
           ends_at: string
           hold_expires_at?: string | null
           id?: string
+          mp_checkout_url?: string | null
           mp_payment_id?: string | null
           paid_at?: string | null
           payment_status?: string
@@ -140,6 +142,7 @@ export type Database = {
           ends_at?: string
           hold_expires_at?: string | null
           id?: string
+          mp_checkout_url?: string | null
           mp_payment_id?: string | null
           paid_at?: string | null
           payment_status?: string

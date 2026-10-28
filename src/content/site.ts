@@ -2,7 +2,7 @@
 export const WHATSAPP_NUMBER = "5585933005196";
 export const WHATSAPP_DISPLAY = "+55 85 93300-5196";
 export const INSTAGRAM_HANDLE = "@studio_talitagarcia";
-export const INSTAGRAM_URL = "https://instagram.com/studio_talitagarcia";
+export const INSTAGRAM_URL = "https://www.instagram.com/studio_talitagarcia/";
 
 export function whatsappLink(message: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
@@ -16,6 +16,8 @@ export function serviceMessage(procedimento: string) {
 }
 
 import perfil from "@/assets/talita-perfil.png.asset.json";
+import retrato from "@/assets/talita-retrato.jpg.asset.json";
+import espaco from "@/assets/studio-espaco.jpg.asset.json";
 
 export const ADDRESS = "Rua Morada Nova, 142 - Passaré, Fortaleza - CE";
 export const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ADDRESS)}`;
@@ -26,8 +28,8 @@ export type Photo = { src?: string; alt: string; label: string };
 
 export const photos = {
   hero: { src: perfil.url, alt: "Talita Garcia no Studio Talita Garcia", label: "Foto da Talita" } as Photo,
-  portrait: { alt: "Retrato profissional de Talita Garcia", label: "Retrato da Talita" } as Photo,
-  space: { alt: "Ambiente do Studio Talita Garcia", label: "Foto do espaço do studio" } as Photo,
+  portrait: { src: retrato.url, alt: "Talita Garcia no studio", label: "Retrato da Talita" } as Photo,
+  space: { src: espaco.url, alt: "Espaço do Studio Talita Garcia", label: "Foto do espaço do studio" } as Photo,
   cta: { alt: "Detalhe do ambiente do Studio Talita Garcia", label: "Detalhe do studio" } as Photo,
 };
 

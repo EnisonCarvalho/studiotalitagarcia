@@ -80,7 +80,7 @@ export function payerEmail(email: string, bookingId: string) {
 /** Pagamento com cartão via Checkout Transparente: o token vem do SDK oficial no navegador (nunca recebemos número/CVV). */
 export async function mpCreateCardPayment(input: {
   bookingId: string; amountCents: number; description: string; email: string;
-  token: string; paymentMethodId: string; issuerId?: string | number; installments: number; idempotencyKey: string;
+  token: string; paymentMethodId: string; issuerId?: string | number | undefined; installments: number; idempotencyKey: string;
 }) {
   const token = mpToken();
   if (!token) throw new Error("payment_not_configured");

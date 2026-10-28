@@ -66,3 +66,48 @@ export async function mpVerifySignature(opts: { signature: string | null; reques
   for (let i = 0; i < hex.length; i++) diff |= hex.charCodeAt(i) ^ v1.charCodeAt(i);
   return diff === 0;
 }
+
+/** E-mail é opcional para a cliente; o Mercado Pago exige um, então usamos um endereço técnico da reserva. */
+export function payerEmail(email: string, bookingId: string) {
+  return email || `cliente.${bookingId.slice(0, 8)}@studiotalitagarcia.lovable.app`;
+}
+
+/** Checkout do Mercado Pago (cartão de crédito). */
+export async function mpCreateCardCheckout(input: {
+  bookingId: string; amountCents: number; title: string; email: string; expiresAt: Date; origin: string;
+}) {
+  const token = mpToken();
+  if (!token) throw new Error("payment_not_configured");
+  const back = `${input.origin}/agendamento/${input.bookingId}`;
+  const res = await fetch(`${API}/checkout/preferences`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      items: [{ id: input.bookingId, title: input.title, quantity: 1, currency_id: "BRL", unit_price: input.amountCents / 100 }],
+      payer: { email: input.email },
+      external_reference: input.bookingId,
+      notification_url: `${input.origin}/api/public/mercadopago`,
+      back_urls: { success: back, pending: back, failure: back },
+      auto_return: "approved",
+      expires: true,
+      expiration_date_to: mpDate(input.expiresAt),
+      payment_methods: { excluded_payment_types: [{ id: "ticket" }, { id: "atm" }, { id: "bank_transfer" }], installments: 1 },
+      statement_descriptor: "TALITA GARCIA",
+    }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) { console.error("Mercado Pago preference failed", res.status, body); throw new Error("mp_pref_failed"); }
+  return String(body.init_point);
+}
+
+/** Pagamentos vinculados a uma reserva (consulta direta na API = fonte da verdade). */
+export async function mpSearchByReference(bookingId: string) {
+  const token = mpToken();
+  if (!token) return [];
+  const res = await fetch(`${API}/v1/payments/search?external_reference=${encodeURIComponent(bookingId)}&sort=date_created&criteria=desc`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  const body = (await res.json()) as { results?: { id: number; status: string; external_reference: string }[] };
+  return (body.results ?? []).filter((p) => p.external_reference === bookingId);
+}

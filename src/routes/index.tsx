@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { MapPin, Heart, Sparkles, Flower2, Menu, X, MessageCircle, Instagram, Camera } from "lucide-react";
 import {
-  ADDRESS, MAPS_EMBED, MAPS_URL, GENERAL_MESSAGE, INSTAGRAM_HANDLE, INSTAGRAM_URL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER,
+  ADDRESS, LOGO, MAPS_EMBED, MAPS_URL, GENERAL_MESSAGE, INSTAGRAM_HANDLE, INSTAGRAM_URL, WHATSAPP_DISPLAY, WHATSAPP_NUMBER,
   gallery, photos, serviceMessage, services, testimonials, whatsappLink,
   type Category, type Photo,
 } from "@/content/site";
@@ -45,11 +45,10 @@ function Img({ photo, className = "" }: { photo: Photo; className?: string }) {
   );
 }
 
-function Logo() {
+function Logo({ className = "h-12 w-12" }: { className?: string }) {
   return (
-    <a href="#inicio" className="leading-none">
-      <span className="block font-serif text-2xl">Talita Garcia</span>
-      <span className="block text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Studio</span>
+    <a href="#inicio" aria-label="Studio Talita Garcia — início" className="shrink-0 leading-none">
+      <img src={LOGO} alt="Logo do Studio Talita Garcia" className={className} />
     </a>
   );
 }
@@ -230,7 +229,7 @@ function Index() {
 
       <footer id="contato" className="scroll-mt-20 border-t border-border bg-cream px-5 py-16">
         <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-3">
-          <div><Logo /><p className="mt-4 max-w-xs text-sm text-muted-foreground">Studio de beleza especializado em cílios, sobrancelhas, unhas e depilação.</p></div>
+          <div><Logo className="h-24 w-24" /><p className="mt-4 max-w-xs text-sm text-muted-foreground">Studio de beleza especializado em cílios, sobrancelhas, unhas e depilação.</p></div>
           <div className="space-y-3 text-sm">
             <p className="font-medium">Contato</p>
             <a href={wa} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary"><MessageCircle className="h-4 w-4" />{WHATSAPP_DISPLAY}</a>

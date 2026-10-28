@@ -18,6 +18,13 @@ export function serviceMessage(procedimento: string) {
 import perfil from "@/assets/talita-perfil.png.asset.json";
 import retrato from "@/assets/talita-retrato.jpg.asset.json";
 import espaco from "@/assets/studio-espaco.jpg.asset.json";
+import logo from "@/assets/logo.png.asset.json";
+import cilios from "@/assets/cilios.jpg.asset.json";
+import sobrancelhas from "@/assets/sobrancelhas.png.asset.json";
+import unhas from "@/assets/unhas.jpg.asset.json";
+import depilacao from "@/assets/depilacao.jpg.asset.json";
+
+export const LOGO = logo.url;
 
 export const ADDRESS = "Rua Morada Nova, 142 - Passaré, Fortaleza - CE";
 export const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ADDRESS)}`;
@@ -42,20 +49,18 @@ export const services: {
   description: string;
   photo: Photo;
 }[] = [
-  { id: "cilios", title: "Cílios", term: "cílios", description: "Realce o olhar com delicadeza e naturalidade.", photo: { alt: "Extensão de cílios realizada no studio", label: "Foto de cílios" } },
-  { id: "sobrancelhas", title: "Sobrancelhas", term: "sobrancelhas", description: "Harmonia e definição para valorizar seu rosto.", photo: { alt: "Design de sobrancelhas realizado no studio", label: "Foto de sobrancelhas" } },
-  { id: "unhas", title: "Unhas", term: "unhas", description: "Manicure, unhas em gel e acrílico, com cuidado e acabamento impecável.", photo: { alt: "Unhas feitas no studio", label: "Foto de unhas" } },
-  { id: "depilacao", title: "Depilação", term: "depilação", description: "Cuidado, conforto e atenção em cada sessão.", photo: { alt: "Ambiente de depilação do studio", label: "Foto de depilação" } },
+  { id: "cilios", title: "Cílios", term: "cílios", description: "Realce o olhar com delicadeza e naturalidade.", photo: { src: cilios.url, alt: "Extensão de cílios realizada no studio", label: "Foto de cílios" } },
+  { id: "sobrancelhas", title: "Sobrancelhas", term: "sobrancelhas", description: "Harmonia e definição para valorizar seu rosto.", photo: { src: sobrancelhas.url, alt: "Design de sobrancelhas realizado no studio", label: "Foto de sobrancelhas" } },
+  { id: "unhas", title: "Unhas", term: "unhas", description: "Manicure, unhas em gel e acrílico, com cuidado e acabamento impecável.", photo: { src: unhas.url, alt: "Unhas feitas no studio", label: "Foto de unhas" } },
+  { id: "depilacao", title: "Depilação", term: "depilação", description: "Cuidado, conforto e atenção em cada sessão.", photo: { src: depilacao.url, alt: "Sessão de depilação com cera no studio", label: "Foto de depilação" } },
 ];
 
 // Galeria: adicione fotos reais com sua categoria.
 export const gallery: (Photo & { category: Category; tall?: boolean })[] = [
-  { category: "Cílios", alt: "Resultado de cílios", label: "Cílios", tall: true },
-  { category: "Sobrancelhas", alt: "Resultado de sobrancelhas", label: "Sobrancelhas" },
-  { category: "Unhas", alt: "Resultado de unhas", label: "Unhas" },
-  { category: "Cílios", alt: "Resultado de cílios", label: "Cílios" },
-  { category: "Unhas", alt: "Resultado de unhas", label: "Unhas", tall: true },
-  { category: "Sobrancelhas", alt: "Resultado de sobrancelhas", label: "Sobrancelhas" },
+  { src: cilios.url, category: "Cílios", alt: "Resultado de cílios", label: "Cílios", tall: true },
+  { src: sobrancelhas.url, category: "Sobrancelhas", alt: "Resultado de sobrancelhas", label: "Sobrancelhas" },
+  { src: unhas.url, category: "Unhas", alt: "Resultado de unhas", label: "Unhas" },
+  { src: depilacao.url, category: "Depilação", alt: "Sessão de depilação com cera", label: "Depilação", tall: true },
 ];
 
 // Depoimentos reais autorizados: { text, name, stars? }

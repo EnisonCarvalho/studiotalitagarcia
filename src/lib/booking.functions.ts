@@ -68,7 +68,7 @@ export const createCardCheckout = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => idSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { mpCreateCardCheckout, mpToken, payerEmail } = await import("@/lib/mercadopago.server");
+    const { mpCreateCheckoutPro, mpToken, payerEmail } = await import("@/lib/mercadopago.server");
     if (!mpToken()) return { ok: false as const, error: "O pagamento online ainda não foi ativado pelo studio. Fale conosco pelo WhatsApp." };
     const { data: b } = await supabaseAdmin.from("bookings").select("*").eq("id", data.id).single();
     if (!b) return { ok: false as const, error: "Reserva não encontrada." };
@@ -76,7 +76,7 @@ export const createCardCheckout = createServerFn({ method: "POST" })
       return { ok: false as const, error: "Essa reserva não está mais aguardando pagamento." };
     if (b.mp_checkout_url) return { ok: true as const, url: b.mp_checkout_url };
     try {
-      const url = await mpCreateCardCheckout({
+      const url = await mpCreateCheckoutPro({
         bookingId: b.id, amountCents: b.deposit_cents, title: `Sinal - ${b.service_name}`, email: payerEmail(b.customer_email, b.id),
         expiresAt: new Date(b.hold_expires_at), origin: new URL(getRequest().url).origin,
       });
@@ -85,7 +85,7 @@ export const createCardCheckout = createServerFn({ method: "POST" })
       return { ok: true as const, url };
     } catch (e) {
       console.error(e);
-      return { ok: false as const, error: "Não foi possível abrir o pagamento com cartão agora. Tente novamente." };
+      return { ok: false as const, error: "Não foi possível abrir o pagamento agora. Tente novamente." };
     }
   });
 

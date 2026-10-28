@@ -13,7 +13,7 @@ function range(view: View, anchor: Date): [Date, Date] {
   const d = new Date(`${localDay(anchor)}T00:00:00-03:00`);
   if (view === "dia") return [d, new Date(d.getTime() + 864e5)];
   if (view === "semana") { const dow = new Date(d.getTime() + 3 * 36e5).getUTCDay(); const s = new Date(d.getTime() - dow * 864e5); return [s, new Date(s.getTime() + 7 * 864e5)]; }
-  if (view === "mes") { const [y, m] = localDay(anchor).split("-").map(Number); return [new Date(`${y}-${String(m).padStart(2, "0")}-01T00:00:00-03:00`), new Date(`${m === 12 ? y + 1 : y}-${String(m === 12 ? 1 : m + 1).padStart(2, "0")}-01T00:00:00-03:00`)]; }
+  if (view === "mes") { const [y = 2026, m = 1] = localDay(anchor).split("-").map(Number); return [new Date(`${y}-${String(m).padStart(2, "0")}-01T00:00:00-03:00`), new Date(`${m === 12 ? y + 1 : y}-${String(m === 12 ? 1 : m + 1).padStart(2, "0")}-01T00:00:00-03:00`)]; }
   return [new Date("2020-01-01"), new Date()];
 }
 

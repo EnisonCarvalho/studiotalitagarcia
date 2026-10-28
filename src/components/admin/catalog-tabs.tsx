@@ -41,7 +41,7 @@ function ServiceRow({ s, onSaved }: { s: Svc; onSaved: () => void }) {
   async function save() {
     const price_cents = toCents(f.price); const duration = Number(f.duration_min);
     const err = validate(f.name, price_cents, duration) ?? (!f.category.trim() ? "Informe a categoria." : null);
-    if (err) return toast.error(err);
+    if (err) { toast.error(err); return; }
     setBusy(true);
     const row = { name: f.name.trim(), category: f.category.trim(), description: f.description || null, price_cents, duration_min: duration, allows_addons: f.allows_addons, active: f.active, sort: f.sort };
     const { error } = s.id ? await supabase.from("services").update(row).eq("id", s.id) : await supabase.from("services").insert(row);
@@ -85,7 +85,7 @@ function AddonRow({ a, onSaved }: { a: Addon; onSaved: () => void }) {
   async function save() {
     const price_cents = toCents(f.price); const duration = Number(f.duration_min);
     const err = validate(f.name, price_cents, duration);
-    if (err) return toast.error(err);
+    if (err) { toast.error(err); return; }
     setBusy(true);
     const row = { name: f.name.trim(), price_cents, duration_min: duration, active: f.active, sort: f.sort, range_note: f.range_note };
     const { error } = a.id ? await supabase.from("addons").update(row).eq("id", a.id) : await supabase.from("addons").insert(row);

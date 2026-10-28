@@ -27,8 +27,8 @@ function HoursRow({ h }: { h: Hours }) {
   const [f, setF] = useState({ ...h, open_time: hhmm(h.open_time), close_time: hhmm(h.close_time), break_start: hhmm(h.break_start), break_end: hhmm(h.break_end) });
   const [busy, setBusy] = useState(false);
   async function save() {
-    if (f.close_time <= f.open_time) return toast.error("O encerramento precisa ser depois da abertura.");
-    if (!!f.break_start !== !!f.break_end || (f.break_start && f.break_end <= f.break_start)) return toast.error("Preencha início e fim da pausa corretamente.");
+    if (f.close_time <= f.open_time) { toast.error("O encerramento precisa ser depois da abertura."); return; }
+    if (!!f.break_start !== !!f.break_end || (f.break_start && f.break_end <= f.break_start)) { toast.error("Preencha início e fim da pausa corretamente."); return; }
     setBusy(true);
     const { error } = await supabase.from("business_hours").update({
       closed: f.closed, open_time: f.open_time, close_time: f.close_time, break_start: f.break_start || null, break_end: f.break_end || null,
@@ -62,15 +62,15 @@ export function BlocksTab() {
   const [e, setE] = useState({ day: "", closed: true, open: "08:00", close: "18:00", note: "" });
 
   async function addBlock() {
-    if (!b.from || !b.to) return toast.error("Informe as datas.");
+    if (!b.from || !b.to) { toast.error("Informe as datas."); return; }
     const starts = toTs(b.from, b.fromTime); const ends = toTs(b.to, b.toTime);
-    if (ends <= starts) return toast.error("O fim precisa ser depois do início.");
+    if (ends <= starts) { toast.error("O fim precisa ser depois do início."); return; }
     const { error } = await supabase.from("calendar_blocks").insert({ starts_at: starts, ends_at: ends, reason: b.reason || null });
     if (error) toast.error(friendlyError(error.message)); else { toast.success("Período bloqueado."); qc.invalidateQueries({ queryKey: ["admin-blocks"] }); }
   }
   async function addException() {
-    if (!e.day) return toast.error("Informe a data.");
-    if (!e.closed && e.close <= e.open) return toast.error("O encerramento precisa ser depois da abertura.");
+    if (!e.day) { toast.error("Informe a data."); return; }
+    if (!e.closed && e.close <= e.open) { toast.error("O encerramento precisa ser depois da abertura."); return; }
     const { error } = await supabase.from("calendar_exceptions").upsert({ day: e.day, closed: e.closed, open_time: e.closed ? null : e.open, close_time: e.closed ? null : e.close, note: e.note || null });
     if (error) toast.error("Não foi possível salvar."); else { toast.success("Data especial salva."); qc.invalidateQueries({ queryKey: ["admin-exceptions"] }); }
   }
@@ -132,7 +132,7 @@ function SettingsForm({ s, onSaved }: { s: { deposit_percent: number; buffer_min
     ["hold_minutes", "Tempo para pagar o Pix (min)", 5, 60], ["slot_step_min", "Horários oferecidos a cada (min)", 5, 120],
   ];
   async function save() {
-    for (const [k, l, min, max] of fields) if (!Number.isInteger(f[k]) || f[k] < min || f[k] > max) return toast.error(`${l}: entre ${min} e ${max}.`);
+    for (const [k, l, min, max] of fields) if (!Number.isInteger(f[k]) || f[k] < min || f[k] > max) { toast.error(`${l}: entre ${min} e ${max}.`); return; }
     const { error } = await supabase.from("settings").update(f).eq("id", 1);
     if (error) toast.error("Não foi possível salvar."); else { toast.success("Ajustes salvos."); onSaved(); }
   }

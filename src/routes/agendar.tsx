@@ -97,7 +97,7 @@ function Agendar() {
     });
     if (error || !data) {
       setBusy(false);
-      setErr(friendlyError(error?.message));
+      setErr(friendlyError(error?.message) ?? null);
       if (error?.message.includes("slot_unavailable")) { setSlot(null); setStep(1); slots.refetch(); }
       return;
     }

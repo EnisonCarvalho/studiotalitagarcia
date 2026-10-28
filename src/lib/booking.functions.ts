@@ -90,12 +90,14 @@ export const createCardPayment = createServerFn({ method: "POST" })
     if (b.status !== "pending" || !b.hold_expires_at || new Date(b.hold_expires_at) <= new Date())
       return { ok: false as const, error: "Essa reserva não está mais aguardando pagamento." };
     try {
+      const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${b.id}:${data.token}`));
+      const idempotencyKey = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
       const p = await mpCreateCardPayment({
         bookingId: b.id, amountCents: b.deposit_cents, description: `Sinal - ${b.service_name} - Studio Talita Garcia`,
         email: data.payerEmail || payerEmail(b.customer_email, b.id),
         token: data.token, paymentMethodId: data.paymentMethodId, issuerId: data.issuerId ?? undefined, installments: data.installments,
         identificationType: data.identificationType, identificationNumber: data.identificationNumber,
-        idempotencyKey: `${b.id}-card-${data.token}`,
+        idempotencyKey,
       });
       await supabaseAdmin.from("bookings").update({ mp_payment_id: p.id, payment_status: p.status }).eq("id", b.id);
       await supabaseAdmin.from("booking_events").insert({ booking_id: b.id, kind: "card_payment", data: { payment_id: p.id, status: p.status, detail: p.detail } });

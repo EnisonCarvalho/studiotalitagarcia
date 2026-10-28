@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { catalogQuery } from "./agendar";
+import { catalogQuery } from "@/lib/catalog-query";
 import { brl } from "@/lib/booking-rules";
 import { CalendarHeart } from "lucide-react";
 import { useState } from "react";
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const nav = [["Início", "inicio"], ["Sobre", "sobre"], ["Serviços", "servicos"], ["Resultados", "resultados"], ["Depoimentos", "depoimentos"], ["Contato", "contato"]];
+const nav = [["Início", "inicio"], ["Sobre", "sobre"], ["Serviços", "servicos"], ["Preços", "precos"], ["Resultados", "resultados"], ["Depoimentos", "depoimentos"], ["Contato", "contato"]];
 const cta = "inline-flex items-center justify-center gap-2 rounded-full bg-cta px-7 py-3.5 text-base font-semibold text-cta-foreground shadow-md transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 const btn = "inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium tracking-wide text-primary-foreground transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 

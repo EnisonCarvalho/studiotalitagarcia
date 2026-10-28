@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { z } from "zod";
@@ -7,11 +7,11 @@ import { ArrowLeft, Check, Clock, Loader2 } from "lucide-react";
 import { ptBR } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar } from "@/components/ui/calendar";
-import { createPixPayment, listCatalog } from "@/lib/booking.functions";
+import { createPixPayment } from "@/lib/booking.functions";
 import { brl, depositSplit, fmtDateTime, fmtTime, friendlyError, localDay, MAX_DURATION_MIN, totals } from "@/lib/booking-rules";
 import { LOGO } from "@/content/site";
 
-export const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => listCatalog() });
+import { catalogQuery } from "@/lib/catalog-query";
 
 export const Route = createFileRoute("/agendar")({
   validateSearch: z.object({ categoria: z.string().optional() }),

@@ -4,6 +4,7 @@
 - [x] Checkout transparente: Pix (QR na página) e cartão (Payment Brick), sem redirecionar nem exigir conta no Mercado Pago
 - [x] Webhook com assinatura e confirmação só após aprovação
 - [x] Atualizar Access Token e Public Key com formulário seguro; consulta somente leitura à conta retorna HTTP 200
-- [ ] Revisar pagamentos de produção, notificações, dados de cartão e logs sem gerar cobranças reais
-- [ ] Publicar alterações e confirmar cadastro do webhook de produção no Mercado Pago Developers
+- [x] Revisar pagamentos de produção: API oficial sem sandbox, webhook canônico no Pix/cartão, identificação tokenizada, validação do valor e repetição segura do mesmo cartão; 13 testes passam
+- [x] Webhook publicado responde HTTP 401 a assinatura inválida; assinatura existente preservada
+- [ ] Publicar alterações e credenciais atualizadas — depende de pedido de publicação; confirmar mesma aplicação das duas credenciais e cadastro/assinatura no painel Mercado Pago Developers
 - [ ] Pagamento real de baixo valor com Pix e cartão — depende de autorização e ação da proprietária; não cobrar automaticamente

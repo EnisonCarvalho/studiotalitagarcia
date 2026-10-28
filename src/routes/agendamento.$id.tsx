@@ -28,14 +28,13 @@ function Status() {
   const { id } = Route.useParams();
   const fetchStatus = useServerFn(getBookingStatus);
   const createPix = useServerFn(createPixPayment);
-  const createCard = useServerFn(createCardCheckout);
+  const payCardFn = useServerFn(createCardPayment);
+  const fetchConfig = useServerFn(getPaymentConfig);
+  const [method, setMethod] = useState<"pix" | "card">("pix");
   const [cardBusy, setCardBusy] = useState(false);
   const [cardErr, setCardErr] = useState<string | null>(null);
-  async function payCard() {
-    setCardBusy(true); setCardErr(null);
-    const r = await createCard({ data: { id } }).catch(() => ({ ok: false as const, error: "Falha de conexão. Tente novamente." }));
-    if (r.ok) window.location.href = r.url; else { setCardErr(r.error); setCardBusy(false); }
-  }
+  const [publicKey, setPublicKey] = useState<string | null>(null);
+  useEffect(() => { fetchConfig().then((c) => setPublicKey(c.publicKey)).catch(() => setPublicKey(null)); }, []);
   const [pixErr, setPixErr] = useState<string | null>(null);
   const [retrying, setRetrying] = useState(false);
   const [copied, setCopied] = useState(false);

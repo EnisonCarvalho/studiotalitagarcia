@@ -15,11 +15,17 @@ export function serviceMessage(procedimento: string) {
   return `Olá, Talita! Conheci seu studio pelo site e gostaria de saber mais sobre os procedimentos de ${procedimento} e os horários disponíveis.`;
 }
 
+import perfil from "@/assets/talita-perfil.png.asset.json";
+
+export const ADDRESS = "Rua Morada Nova, 142 - Passaré, Fortaleza - CE";
+export const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ADDRESS)}`;
+export const MAPS_EMBED = `https://www.google.com/maps?q=${encodeURIComponent(ADDRESS)}&output=embed`;
+
 // Fotos: preencha `src` com o endereço da imagem quando disponível.
 export type Photo = { src?: string; alt: string; label: string };
 
 export const photos = {
-  hero: { alt: "Talita Garcia no Studio Talita Garcia", label: "Foto da Talita" } as Photo,
+  hero: { src: perfil.url, alt: "Talita Garcia no Studio Talita Garcia", label: "Foto da Talita" } as Photo,
   portrait: { alt: "Retrato profissional de Talita Garcia", label: "Retrato da Talita" } as Photo,
   space: { alt: "Ambiente do Studio Talita Garcia", label: "Foto do espaço do studio" } as Photo,
   cta: { alt: "Detalhe do ambiente do Studio Talita Garcia", label: "Detalhe do studio" } as Photo,

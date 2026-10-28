@@ -1,3 +1,4 @@
-- [x] Substituir somente as fotos de Resultados reais pelas seis novas fotos enviadas.
-- [x] Incluir Suely, Ana e Isabella em depoimentos de cinco estrelas com abas automáticas.
-- [x] Conferir fotos, filtros e rotação dos depoimentos no site.
+- [x] Agendamento online com reserva temporária e sem conflitos
+- [x] Painel da Talita (agenda, serviços, adicionais, horários, bloqueios, ajustes)
+- [x] Pagamento do sinal via Pix e cartão (Mercado Pago) — código pronto
+- [ ] Ativar Mercado Pago: aguardando Access Token e chave de assinatura do webhook

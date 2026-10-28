@@ -213,7 +213,7 @@ function Index() {
           <div className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {services.map((s) => (
               <article key={s.id} id={s.id} className="flex flex-col rounded-xl bg-card p-3">
-                <div className="aspect-[4/5]"><Img photo={s.photo} /></div>
+                <div className="aspect-[4/5] overflow-hidden rounded-xl"><Img photo={s.photo} className="kenburns" /></div>
                 <div className="flex flex-1 flex-col p-3">
                   <h3 className="text-2xl">{s.title}</h3>
                   <p className="mt-2 flex-1 text-sm text-muted-foreground">{s.description}</p>

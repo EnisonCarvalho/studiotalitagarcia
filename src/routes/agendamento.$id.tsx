@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type ReactNode } from "react";
-import { CheckCircle2, Copy, Loader2, MessageCircle, XCircle } from "lucide-react";
-import { createPixPayment, getBookingStatus } from "@/lib/booking.functions";
+import { CheckCircle2, Copy, CreditCard, Loader2, MessageCircle, XCircle } from "lucide-react";
+import { createCardCheckout, createPixPayment, getBookingStatus } from "@/lib/booking.functions";
 import { brl, fmtDateTime } from "@/lib/booking-rules";
 import { ADDRESS, LOGO, whatsappLink } from "@/content/site";
 
@@ -27,6 +27,14 @@ function Status() {
   const { id } = Route.useParams();
   const fetchStatus = useServerFn(getBookingStatus);
   const createPix = useServerFn(createPixPayment);
+  const createCard = useServerFn(createCardCheckout);
+  const [cardBusy, setCardBusy] = useState(false);
+  const [cardErr, setCardErr] = useState<string | null>(null);
+  async function payCard() {
+    setCardBusy(true); setCardErr(null);
+    const r = await createCard({ data: { id } }).catch(() => ({ ok: false as const, error: "Falha de conexão. Tente novamente." }));
+    if (r.ok) window.location.href = r.url; else { setCardErr(r.error); setCardBusy(false); }
+  }
   const [pixErr, setPixErr] = useState<string | null>(null);
   const [retrying, setRetrying] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -103,7 +111,7 @@ function Status() {
 
   return shell(
     <div>
-      <h1 className="text-center text-4xl">Pague o sinal via Pix</h1>
+      <h1 className="text-center text-4xl">Pague o sinal</h1>
       <p className="mt-2 text-center text-muted-foreground">Horário reservado por <strong className="text-foreground">{mm}:{ss}</strong>. Aguardando pagamento…</p>
       {b.pix_qr_code ? (
         <div className="mt-6 rounded-xl border border-border bg-card p-6 text-center">
@@ -120,6 +128,13 @@ function Status() {
           <button onClick={retryPix} disabled={retrying} className="mt-4 inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3 font-semibold text-cta-foreground disabled:opacity-50">{retrying && <Loader2 className="h-4 w-4 animate-spin" />}Gerar Pix</button>
         </div>
       )}
+      <div className="mt-4 rounded-xl border border-border bg-card p-6 text-center">
+        <p className="text-sm text-muted-foreground">Prefere cartão de crédito?</p>
+        <button onClick={payCard} disabled={cardBusy} className="mt-3 inline-flex items-center gap-2 rounded-full border border-primary px-6 py-3 text-sm font-medium text-primary disabled:opacity-50">
+          {cardBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}Pagar sinal com cartão
+        </button>
+        {cardErr && <p role="alert" className="mt-3 text-sm">{cardErr}</p>}
+      </div>
       {details}
     </div>,
   );

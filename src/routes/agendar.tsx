@@ -86,7 +86,7 @@ function Agendar() {
   }
 
   const phoneDigits = form.phone.replace(/\D/g, "");
-  const formOk = form.name.trim().length >= 2 && phoneDigits.length >= 10 && phoneDigits.length <= 13 && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim());
+  const formOk = form.name.trim().length >= 2 && phoneDigits.length >= 10 && phoneDigits.length <= 13 && (form.email.trim() === "" || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim()));
 
   async function confirm() {
     if (!service || !slot) return;
@@ -196,7 +196,7 @@ function Agendar() {
           <section>
             <h1 className="text-4xl">Seus dados</h1>
             <div className="mt-6 grid gap-4">
-              {([["name", "Nome", "text", "name", 100], ["phone", "WhatsApp com DDD", "tel", "tel", 20], ["email", "E-mail (para o comprovante do Pix)", "email", "email", 255]] as const).map(([k, label, type, ac, max]) => (
+              {([["name", "Nome", "text", "name", 100], ["phone", "WhatsApp com DDD", "tel", "tel", 20], ["email", "E-mail (opcional)", "email", "email", 255]] as const).map(([k, label, type, ac, max]) => (
                 <label key={k} className="grid gap-1.5 text-sm">
                   {label}
                   <input type={type} autoComplete={ac} maxLength={max} value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })}
@@ -222,7 +222,7 @@ function Agendar() {
               <Row k={`Sinal agora (${cat.depositPercent}%)`} v={brl(split.deposit)} strong />
               <Row k="Restante no atendimento" v={brl(split.balance)} />
             </dl>
-            <p className="mt-4 text-sm text-muted-foreground">Ao continuar, o horário fica reservado por alguns minutos enquanto você paga o sinal via Pix. A confirmação só acontece após o pagamento.</p>
+            <p className="mt-4 text-sm text-muted-foreground">Ao continuar, o horário fica reservado por alguns minutos enquanto você paga o sinal via Pix ou cartão de crédito. A confirmação só acontece após o pagamento.</p>
           </section>
         )}
       </main>
@@ -237,7 +237,7 @@ function Agendar() {
             {step < 3 ? (
               <button className={pill} disabled={(step === 0 && (!t || !t.withinLimit)) || (step === 1 && !slot) || (step === 2 && !formOk)} onClick={() => { setErr(null); setStep(step + 1); }}>Continuar</button>
             ) : (
-              <button className={pill} disabled={busy} onClick={confirm}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}Pagar sinal via Pix</button>
+              <button className={pill} disabled={busy} onClick={confirm}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}Ir para o pagamento</button>
             )}
           </div>
         </div>

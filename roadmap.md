@@ -1,6 +1,8 @@
 - [x] Agendamento online com reserva temporária e sem conflitos
 - [x] Painel da Talita (agenda, serviços, adicionais, horários, bloqueios, ajustes) — testado
 - [x] E-mail opcional; animação de aproximação nas fotos dos serviços
-- [x] Checkout Pro (Pix ou cartão) + webhook com assinatura e confirmação só após aprovação
-- [ ] Ativar Mercado Pago: aguardando Access Token e assinatura secreta do webhook
+- [x] Checkout transparente: Pix (QR na página) e cartão (Payment Brick), sem redirecionar nem exigir conta no Mercado Pago
+- [x] Webhook com assinatura e confirmação só após aprovação; Access Token e assinatura secreta salvos
+- [ ] Configurar a chave pública do Mercado Pago (MERCADOPAGO_PUBLIC_KEY) para ativar o pagamento com cartão
 - [ ] Publicar e cadastrar o webhook no Mercado Pago Developers
+- [ ] Teste real ponta a ponta (Pix e cartão) após publicar

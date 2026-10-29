@@ -1,8 +1,7 @@
 - [x] Agendamento online com reserva temporária e sem conflitos
 - [x] Convidar talitasw277@gmail.com e preparar transferência administrativa por identificação autorizada; acesso efetivo antigo bloqueado, usuário e dados preservados
-- [ ] Remover função antiga e ativar função da conta correta automaticamente quando a titular confirmar o convite
-- [ ] Ativar acesso da Talita no e-mail correto — depende de a titular confirmar o e-mail
-- [ ] Verificar agenda e alterações como talitasw277@gmail.com — depende da confirmação do convite; pagamentos e agendamentos preservados
+- [x] Confirmação registrada no e-mail correto; função administrativa ativada e função antiga removida sem excluir usuários
+- [x] Verificar acesso e agenda real como talitasw277@gmail.com; serviços e horários disponíveis, sem modificar agendamentos ou pagamentos
 - [x] Completar painel existente: cadastro manual, reagendamento que preserva pagamentos, status real armazenado e auditoria
 - [x] Painel existente de agenda, serviços, adicionais, horários, bloqueios e ajustes; acesso não confirmado corretamente bloqueado
 - [x] E-mail opcional; animação de aproximação nas fotos dos serviços

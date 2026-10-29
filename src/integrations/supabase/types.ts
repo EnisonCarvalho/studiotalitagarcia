@@ -44,6 +44,36 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_audit: {
+        Row: {
+          action: string
+          actor_id: string | null
+          changes: Json | null
+          created_at: string
+          entity: string
+          id: string
+          record_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          changes?: Json | null
+          created_at?: string
+          entity: string
+          id?: string
+          record_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          changes?: Json | null
+          created_at?: string
+          entity?: string
+          id?: string
+          record_id?: string | null
+        }
+        Relationships: []
+      }
       booking_events: {
         Row: {
           booking_id: string
@@ -326,6 +356,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_create_booking: {
+        Args: {
+          _addon_ids: string[]
+          _email: string
+          _name: string
+          _phone: string
+          _service_id: string
+          _starts_at: string
+        }
+        Returns: string
+      }
+      admin_reschedule_booking: {
+        Args: {
+          _email: string
+          _id: string
+          _name: string
+          _phone: string
+          _starts_at: string
+        }
+        Returns: undefined
+      }
       apply_payment_status: {
         Args: { _booking_id: string; _mp_status: string; _payment_id: string }
         Returns: Database["public"]["Enums"]["booking_status"]

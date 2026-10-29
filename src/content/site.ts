@@ -33,8 +33,14 @@ import sobrancelhasTg from "@/assets/sobrancelhas-cilios-tg.png.asset.json";
 export const LOGO = logo.url;
 
 export const ADDRESS = "Rua Morada Nova, 142 - Passaré, Fortaleza - CE";
-export const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ADDRESS)}`;
-export const MAPS_EMBED = `https://www.google.com/maps?q=${encodeURIComponent(ADDRESS)}&output=embed`;
+
+// Ponto exato do Studio Talita Garcia (Fortaleza - CE).
+export const STUDIO_LAT = -3.8159615;
+export const STUDIO_LNG = -38.5414843;
+
+export const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${STUDIO_LAT},${STUDIO_LNG}`;
+// Marcador e centro do mapa no ponto exato do studio.
+export const MAPS_EMBED = `https://www.google.com/maps?q=${STUDIO_LAT},${STUDIO_LNG}&z=17&output=embed`;
 
 // Fotos: preencha `src` com o endereço da imagem quando disponível.
 export type Photo = { src?: string; alt: string; label: string };

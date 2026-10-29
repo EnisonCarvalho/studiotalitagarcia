@@ -1,5 +1,6 @@
 - [x] Agendamento online com reserva temporária e sem conflitos
 - [ ] Configurar primeiro administrador com titularidade validada e definição segura de senha
+- [ ] Conferência final da Talita sem alterar senha/criar usuários/pagamentos — acesso efetivo bloqueado por e-mail não confirmado
 - [ ] Completar painel existente: cadastro manual, reagendamento, status de pagamento e auditoria; verificar acesso real
 - [x] Painel da Talita (agenda, serviços, adicionais, horários, bloqueios, ajustes) — testado
 - [x] E-mail opcional; animação de aproximação nas fotos dos serviços

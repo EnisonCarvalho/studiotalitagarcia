@@ -1,6 +1,6 @@
 - [x] Agendamento online com reserva temporária e sem conflitos
 - [x] Melhorar login e recuperação: mostrar senha, link dedicado, validação do link, confirmação de sucesso; nove testes passaram sem trocar a senha real
-- [ ] Publicar fluxo seguro de definição de senha por convite e acesso /admin; manter confirmação de e-mail obrigatória
+- [x] Solicitar publicação do fluxo seguro de senha e /admin; confirmação de e-mail obrigatória verificada, link de recuperação enviado
 - [x] Convidar talitasw277@gmail.com e preparar transferência administrativa por identificação autorizada; acesso efetivo antigo bloqueado, usuário e dados preservados
 - [x] Confirmação registrada no e-mail correto; função administrativa ativada e função antiga removida sem excluir usuários
 - [x] Verificar acesso e agenda real como talitasw277@gmail.com; serviços e horários disponíveis, sem modificar agendamentos ou pagamentos
@@ -12,5 +12,5 @@
 - [x] Atualizar Access Token e Public Key com formulário seguro; consulta somente leitura à conta retorna HTTP 200
 - [x] Revisar pagamentos de produção: API oficial sem sandbox, webhook canônico no Pix/cartão, identificação tokenizada, validação do valor e repetição segura do mesmo cartão; 13 testes passam
 - [x] Webhook publicado responde HTTP 401 a assinatura inválida; assinatura existente preservada
-- [ ] Publicar alterações e credenciais atualizadas — depende de pedido de publicação; confirmar mesma aplicação das duas credenciais e cadastro/assinatura no painel Mercado Pago Developers
+- [ ] Verificar conclusão da publicação solicitada; confirmação das credenciais e cadastro/assinatura no Mercado Pago dependem da proprietária
 - [ ] Pagamento real de baixo valor com Pix e cartão — depende de autorização e ação da proprietária; não cobrar automaticamente

@@ -1,7 +1,8 @@
 - [x] Agendamento online com reserva temporária e sem conflitos
-- [ ] Configurar primeiro administrador com titularidade validada e definição segura de senha
-- [ ] Completar painel existente: cadastro manual, reagendamento, status de pagamento e auditoria; verificar acesso real
-- [x] Painel da Talita (agenda, serviços, adicionais, horários, bloqueios, ajustes) — testado
+- [ ] Ativar acesso da Talita — conta e função admin existentes, confirmação reenviada; depende de a titular confirmar o e-mail
+- [ ] Verificar agenda e alterações como Talita — acesso bloqueado por e-mail não confirmado; nenhuma senha ou integração de pagamentos alterada
+- [x] Completar painel existente: cadastro manual, reagendamento que preserva pagamentos, status real armazenado e auditoria
+- [x] Painel existente de agenda, serviços, adicionais, horários, bloqueios e ajustes; acesso não confirmado corretamente bloqueado
 - [x] E-mail opcional; animação de aproximação nas fotos dos serviços
 - [x] Checkout transparente: Pix (QR na página) e cartão (Payment Brick), sem redirecionar nem exigir conta no Mercado Pago
 - [x] Webhook com assinatura e confirmação só após aprovação

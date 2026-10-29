@@ -27,9 +27,8 @@ function ResetPassword() {
     const hash = new URLSearchParams(window.location.hash.slice(1));
     const recovery = hash.get("type") === "recovery" || hash.get("type") === "invite";
     // Capture the action before the client consumes its hash. No other session may define a password here.
-    if (!recovery) { setMessage("Link inválido ou expirado. Solicite outro em Entrar no painel."); return; }
     supabase.auth.getUser().then(({ data, error }) => {
-      if (error || !data.user) setMessage("Link inválido ou expirado. Solicite outro em Entrar no painel.");
+      if ((!recovery && sessionStorage.getItem("studio-password-recovery") !== "active") || error || !data.user) setMessage("Link inválido ou expirado. Solicite outro em Entrar no painel.");
       else { setReady(true); setMessage(""); }
     });
   }, []);
@@ -40,6 +39,7 @@ function ResetPassword() {
     const { error } = await supabase.auth.updateUser({ password });
     setBusy(false);
     if (error) { setMessage("Não foi possível definir a senha. Solicite um novo link e tente novamente."); return; }
+    sessionStorage.removeItem("studio-password-recovery");
     navigate({ to: "/admin", replace: true });
   }
   return <main className="flex min-h-screen items-center justify-center px-5"><div className="w-full max-w-sm">

@@ -7,6 +7,8 @@ import { LOGO } from "@/content/site";
 import { AgendaTab } from "@/components/admin/agenda-tab";
 import { ServicesTab, AddonsTab } from "@/components/admin/catalog-tabs";
 import { HoursTab, BlocksTab, SettingsTab } from "@/components/admin/schedule-tabs";
+import { Button } from "@/components/ui/button";
+import { hasVerifiedAdmin } from "@/lib/admin-booking-schema";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -32,7 +34,11 @@ function Admin() {
   const [tab, setTab] = useState<(typeof tabs)[number][0]>("agenda");
   const role = useQuery({
     queryKey: ["is-admin", user.id],
-    queryFn: async () => (await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" })).data === true,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      if (error) throw error;
+      return hasVerifiedAdmin(data === true, user.email_confirmed_at ?? null);
+    },
   });
 
   async function signOut() {
@@ -46,7 +52,7 @@ function Admin() {
       <header className="border-b border-border bg-background">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
           <Link to="/" className="flex items-center gap-3"><img src={LOGO} alt="" className="h-10 w-10" /><span className="font-serif text-xl">Painel do Studio</span></Link>
-          <button onClick={signOut} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><LogOut className="h-4 w-4" />Sair</button>
+           <Button variant="ghost" onClick={signOut} className="text-muted-foreground"><LogOut />Sair</Button>
         </div>
       </header>
       {role.isLoading ? (
@@ -60,8 +66,8 @@ function Admin() {
         <main className="mx-auto max-w-6xl px-5 py-6">
           <nav className="mb-6 flex gap-2 overflow-x-auto pb-1" aria-label="Seções do painel">
             {tabs.map(([k, l]) => (
-              <button key={k} onClick={() => setTab(k)} aria-pressed={tab === k}
-                className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm ${tab === k ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background"}`}>{l}</button>
+               <Button variant={tab === k ? "default" : "outline"} key={k} onClick={() => setTab(k)} aria-pressed={tab === k}
+                 className="rounded-full">{l}</Button>
             ))}
           </nav>
           {tab === "agenda" && <AgendaTab />}

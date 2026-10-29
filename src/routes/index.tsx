@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { catalogQuery } from "@/lib/catalog-query";
 import { brl } from "@/lib/booking-rules";
 import { CalendarHeart } from "lucide-react";
@@ -95,7 +95,7 @@ function SectionTitle({ eyebrow, title, sub }: { eyebrow?: string; title: string
 }
 
 function Prices() {
-  const { data } = useQuery(catalogQuery);
+  const { data } = useSuspenseQuery(catalogQuery);
   const groups = new Map<string, NonNullable<typeof data>["services"]>();
   for (const s of data?.services ?? []) groups.set(s.category, [...(groups.get(s.category) ?? []), s]);
   return (

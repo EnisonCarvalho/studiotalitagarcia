@@ -60,7 +60,7 @@ function Admin() {
       ) : !role.data ? (
         <div className="mx-auto max-w-md p-10 text-center">
           <h1 className="text-3xl">Acesso restrito</h1>
-          <p className="mt-2 text-muted-foreground">Esta conta ({user.email}) não tem permissão de administradora.</p>
+           <p className="mt-2 text-muted-foreground">{!user.email_confirmed_at ? `Confirme o e-mail ${user.email} pelo link recebido para liberar seu acesso.` : `Esta conta (${user.email}) não tem permissão de administradora.`}</p>
         </div>
       ) : (
         <main className="mx-auto max-w-6xl px-5 py-6">

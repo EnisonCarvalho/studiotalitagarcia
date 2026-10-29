@@ -69,7 +69,7 @@ export function ResetPassword() {
     {ready && !success && <form onSubmit={submit} className="mt-6 grid gap-3"><label className="grid gap-1 text-sm">Nova senha<PasswordInput required minLength={MIN_PASSWORD_LENGTH} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} /></label><p className="text-sm text-muted-foreground">Pelo menos 8 caracteres.</p><label className="grid gap-1 text-sm">Confirmar senha<PasswordInput required minLength={MIN_PASSWORD_LENGTH} autoComplete="new-password" value={repeat} onChange={(e) => setRepeat(e.target.value)} /></label><Button disabled={busy} type="submit">{busy ? "Salvando…" : "Salvar senha"}</Button></form>}
     {message && <p role={success ? "status" : "alert"} className="mt-4 text-center text-sm">{message}</p>}
     {!checking && !ready && <RecoveryRequest />}
-    <Button className="mt-4 w-full" variant="link" onClick={() => navigate({ to: success ? "/admin" : "/auth" })}>{success ? "Ir para o painel" : "Entrar no painel"}</Button>
+    <Button className="mt-4 w-full" variant="link" onClick={() => navigate({ to: success ? "/admin" : "/auth", replace: success })}>{success ? "Ir para o painel" : "Entrar no painel"}</Button>
   </div></main>;
 }
 

@@ -1,0 +1,2 @@
+CREATE OR REPLACE FUNCTION public.grant_owner_admin() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$ BEGIN RETURN new; END $$;
+REVOKE ALL ON FUNCTION public.grant_owner_admin() FROM PUBLIC,anon,authenticated;

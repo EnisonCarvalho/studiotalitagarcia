@@ -1,4 +1,5 @@
 - [x] Agendamento online com reserva temporária e sem conflitos
+- [ ] Melhorar login e recuperação: mostrar senha, link dedicado, validação do link, confirmação de sucesso e testes sem trocar a senha real
 - [x] Convidar talitasw277@gmail.com e preparar transferência administrativa por identificação autorizada; acesso efetivo antigo bloqueado, usuário e dados preservados
 - [x] Confirmação registrada no e-mail correto; função administrativa ativada e função antiga removida sem excluir usuários
 - [x] Verificar acesso e agenda real como talitasw277@gmail.com; serviços e horários disponíveis, sem modificar agendamentos ou pagamentos

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AgendarRouteImport } from './routes/agendar'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AgendamentoIdRouteImport } from './routes/agendamento.$id'
 import { Route as ApiPublicMercadopagoRouteImport } from './routes/api/public/mercadopago'
@@ -36,6 +37,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -56,6 +62,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/agendar': typeof AgendarRoute
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/agendamento/$id': typeof AgendamentoIdRoute
   '/api/public/mercadopago': typeof ApiPublicMercadopagoRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agendar': typeof AgendarRoute
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/agendamento/$id': typeof AgendamentoIdRoute
   '/api/public/mercadopago': typeof ApiPublicMercadopagoRoute
@@ -74,6 +82,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/agendar': typeof AgendarRoute
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/agendamento/$id': typeof AgendamentoIdRoute
   '/api/public/mercadopago': typeof ApiPublicMercadopagoRoute
@@ -84,6 +93,7 @@ export interface FileRouteTypes {
     | '/'
     | '/agendar'
     | '/auth'
+    | '/reset-password'
     | '/admin'
     | '/agendamento/$id'
     | '/api/public/mercadopago'
@@ -92,6 +102,7 @@ export interface FileRouteTypes {
     | '/'
     | '/agendar'
     | '/auth'
+    | '/reset-password'
     | '/admin'
     | '/agendamento/$id'
     | '/api/public/mercadopago'
@@ -101,6 +112,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/agendar'
     | '/auth'
+    | '/reset-password'
     | '/_authenticated/admin'
     | '/agendamento/$id'
     | '/api/public/mercadopago'
@@ -111,6 +123,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AgendarRoute: typeof AgendarRoute
   AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   AgendamentoIdRoute: typeof AgendamentoIdRoute
   ApiPublicMercadopagoRoute: typeof ApiPublicMercadopagoRoute
 }
@@ -143,6 +156,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -185,6 +205,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AgendarRoute: AgendarRoute,
   AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   AgendamentoIdRoute: AgendamentoIdRoute,
   ApiPublicMercadopagoRoute: ApiPublicMercadopagoRoute,
 }

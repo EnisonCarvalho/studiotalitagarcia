@@ -1,5 +1,6 @@
 - [x] Agendamento online com reserva temporária e sem conflitos
-- [ ] Ativar acesso da Talita — conta e função admin existentes, confirmação reenviada; depende de a titular confirmar o e-mail
+- [ ] Corrigir administradora para talitasw277@gmail.com: convite seguro, confirmação de titularidade, revogação do acesso antigo sem excluir dados
+- [ ] Ativar acesso da Talita no e-mail correto — depende de a titular confirmar o e-mail
 - [ ] Verificar agenda e alterações como Talita — acesso bloqueado por e-mail não confirmado; nenhuma senha ou integração de pagamentos alterada
 - [x] Completar painel existente: cadastro manual, reagendamento que preserva pagamentos, status real armazenado e auditoria
 - [x] Painel existente de agenda, serviços, adicionais, horários, bloqueios e ajustes; acesso não confirmado corretamente bloqueado
